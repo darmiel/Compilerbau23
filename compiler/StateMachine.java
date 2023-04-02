@@ -14,11 +14,6 @@ public abstract class StateMachine implements StateMachineIntf, Cloneable {
 	private HashMap<String, State> m_stateMap; 	// set of states
 	protected boolean m_traceFinished = false;
 
-	/**
-	 * get start state
-	 */
-	public abstract String getStartState();
-
 	public StateMachine() {
 		m_input = new InputReader("");
 		m_stateMap = new HashMap<String, State>();

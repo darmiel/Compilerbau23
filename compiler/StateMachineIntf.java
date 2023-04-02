@@ -23,6 +23,12 @@ public interface StateMachineIntf {
 	// methods for input processing
 
 	/**
+	 * get start state
+	 * this method has to be overwritten by the implementer of a final state machine
+	 */
+	public abstract String getStartState();
+	
+	/**
 	 * initialize processing of input
 	 */
 	public void init(String input);
