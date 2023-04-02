@@ -6,34 +6,48 @@ import java.util.Map;
 /**
  * single state of a deterministic finite state machine with transitions
  */
-public class State {
+public class State implements StateIntf {
 	private String m_name;
+	private boolean m_isFinal;
 	// part of transition function
 	private HashMap<String, String> m_transitionMap;
 
-	public State(String name) {
+	public State(String name, boolean isFinal) {
 		m_name = name;
+		m_isFinal = isFinal;
 		m_transitionMap = new HashMap<String, String>();
 	}
-	
+
+    @Override
 	public void addTransition(char terminal, String targetState) {
 		m_transitionMap.put(String.valueOf(terminal), targetState);
 	}
 
-    public void addTransitionRange(char first, char last, String targetState) {
-        for (char c = first; c <= last; c++) {
-            addTransition(c, targetState);
-        }
-    }
+    @Override
+	public void addTransitionRange(char first, char last, String targetState) {
+		for (char c = first; c <= last; c++) {
+			addTransition(c, targetState);
+		}
+	}
 
+    @Override
 	public String getTransition(char terminal) {
 		return m_transitionMap.get(String.valueOf(terminal));
 	}
 
+    @Override
 	public String getName() {
 		return m_name;
 	}
 
+    @Override
+	public boolean isFinal() {
+		return m_isFinal;
+	}
+
+	/**
+	 * tranform description of this state into dot format
+	 */
 	public String transitionsAsDot(boolean collapse) {
 		if (collapse) {
 			return transitionsAsDot(getName(), Utils.collapse(m_transitionMap));

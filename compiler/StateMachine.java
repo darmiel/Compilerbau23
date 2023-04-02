@@ -1,26 +1,41 @@
 package compiler;
 
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * deterministic finish state machine with transition table
+ * finish state machine
  */
-public abstract class StateMachine extends StateMachineBase {
-	// set of states
-	protected HashMap<String, State> m_stateMap;
-
-	public StateMachine() {
-		super();
-		m_stateMap = new HashMap<String, State>();
-		initStateTable();
-	}
+public abstract class StateMachine implements StateMachineIntf, Cloneable {
+	private InputReader m_input; // input to process
+	private String m_state; // current state
+	private HashMap<String, State> m_stateMap; 	// set of states
+	protected boolean m_traceFinished = false;
 
 	/**
-	 * initialize state transition table
+	 * get start state
 	 */
-	public abstract void initStateTable();
+	public abstract String getStartState();
+
+	public StateMachine() {
+		m_input = new InputReader("");
+		m_stateMap = new HashMap<String, State>();
+		initStateTable();
+		m_state = getStartState();
+	}
+
+	@Override
+	public void addState(State state) {
+		m_stateMap.put(state.getName(), state);
+	}
+
+	@Override
+	public void init(String input) {
+		m_input = new InputReader(input);
+		m_state = getStartState();
+	}
 
 	@Override
 	public void step() {
@@ -37,6 +52,96 @@ public abstract class StateMachine extends StateMachineBase {
         	m_state = nextState.getName();
         }
         m_input.advance();
+	}
+
+	@Override
+	public void process(String input, OutputStreamWriter outStream) throws Exception {
+		init(input);
+		traceHead(outStream);
+		outStream.write('\n');
+
+		// iterate until finished
+		while (!isFinished()) {
+			// dump state
+			trace(outStream);
+			outStream.write('\n');
+			// execute next step
+			step();
+		}
+		// dump final state
+		trace(outStream);
+		outStream.write('\n');
+		if (isFinalState()) {
+			outStream.write("ACCEPT\n");
+		} else {
+			outStream.write("FAIL\n");		
+		}
+		outStream.flush();
+	}
+
+	@Override
+	public boolean isFinalState() {
+		State state = m_stateMap.get(m_state);
+		return (state != null) && state.isFinal();
+	}
+
+	@Override
+	public boolean isFinished() {
+		return m_input.currentChar() == 0 || m_state.equals("error");
+	}
+
+	/**
+	 * dump the current machine state
+	 */
+	public void trace(OutputStreamWriter outStream) throws Exception {
+		// trace finished state only once
+		if (m_traceFinished) {
+			traceBlank(outStream);
+		} else {
+			traceState(outStream);
+		}
+		if (isFinished()) {
+			m_traceFinished = true;
+		}
+	}
+	
+	/**
+	 * trace the current state
+	 */
+	private void traceState(OutputStreamWriter outStream) throws Exception {
+		// dump input
+		m_input.traceState(outStream);
+		outStream.write(" | ");
+		// dump state with padding
+		outStream.write(m_state);
+		for (int i = m_state.length(); i < 10; i++) {
+			outStream.write (' ');
+		}
+		
+	}
+
+	/**
+	 * trace blanks instead of actual state (since machine is finished)
+	 */
+	private void traceBlank(OutputStreamWriter outStream) throws Exception {
+		// dump input
+		m_input.traceBlank(outStream);
+		outStream.write("   ");
+		// dump padding for state
+		for (int i = 0; i < 10; i++) {
+			outStream.write (' ');
+		}		
+	}
+	
+	private void traceHead(OutputStreamWriter outStream) throws Exception {
+		// dump input
+		m_input.traceHead(outStream);
+		outStream.write(" | ");
+		// dump padding for state
+		outStream.write("STATE");
+		for (int i = 5; i < 10; i++) {
+			outStream.write (' ');
+		}		
 	}
 
 	public String asDot() {
@@ -58,21 +163,26 @@ public abstract class StateMachine extends StateMachineBase {
 	}
 
 	private Set<String> getFinalStates() {
-		/*
-		 * FIXME: Since no proper data structure is used for the final states, but an
-		 * abstract function, we have to change the objects inner state. That's quite
-		 * hacky. We should think about storing the final states directly in a set. This
-		 * would make this function no longer necessary.
-		 */
 		Set<String> result = new HashSet<>();
 		String previousState = m_state;
 		for (String state : m_stateMap.keySet()) {
-			m_state = state;
-			if (isFinalState()) {
+			if (m_stateMap.get(state).isFinal()) {
 				result.add(state);
 			}
 		}
 		m_state = previousState;
 		return result;
 	}
+
+	/**
+	 * clone in case of non-deterministic decision
+	 */
+	public Object clone() throws CloneNotSupportedException {
+		StateMachine theClone = (StateMachine)super.clone();
+		theClone.m_input = (InputReader)m_input.clone();
+		theClone.m_state = new String(m_state);
+		theClone.m_traceFinished = false;
+		return theClone;
+	}
+
 }
