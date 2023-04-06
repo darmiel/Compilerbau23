@@ -4,6 +4,6 @@ public class StringliteralMachine {
     System.out.println("HelloWorld");
     compiler.StateMachine abMachine = new compiler.machines.StringliteralMachine();
     java.io.OutputStreamWriter outWriter = new java.io.OutputStreamWriter(System.out);
-    abMachine.process('', outWriter);
+    abMachine.process("hello there", outWriter);
   }
 }
