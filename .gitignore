@@ -1,3 +1,4 @@
-Compilerbau23.iml
-/out
-/.idea
+.idea/
+*.iml
+.vscode/
+.out/
