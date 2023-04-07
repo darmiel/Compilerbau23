@@ -35,6 +35,6 @@ public class ZeilenkommentarMachine extends compiler.StateMachine{
 
     @Override
     public String getStartState() {
-        return null;
+        return "start";
     }
 }
