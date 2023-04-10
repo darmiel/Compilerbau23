@@ -15,8 +15,9 @@ public abstract class StateMachine implements StateMachineIntf, Cloneable {
 	protected boolean m_traceFinished = false;
 
 	@Override
-	public void addState(State state) {
+	public StateIntf addState(State state) {
 		m_stateMap.put(state.getName(), state);
+		return state;
 	}
 
 	@Override
