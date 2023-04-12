@@ -1,9 +1,0 @@
-public class TestABCMachine {
-
-  public static void main(String[] args) throws Exception {
-    System.out.println("HelloWorld");
-    compiler.StateMachine abMachine = new compiler.machines.ABMachine();
-    java.io.OutputStreamWriter outWriter = new java.io.OutputStreamWriter(System.out);
-    abMachine.process("ADC", outWriter);
-  }
-}
