@@ -2,11 +2,14 @@ package compiler.machines;
 
 import compiler.State;
 import compiler.StateMachine;
-import compiler.TestKeywordMachine;
 
 public class KeywordMachine extends StateMachine{
 
-    private final String keyword = TestKeywordMachine.KEYWORD;
+    private final String keyword;
+
+    public KeywordMachine(String keyword) {
+        this.keyword = keyword;
+    }
 
     @Override
     public void initStateTable() {
