@@ -3,7 +3,6 @@ package compiler;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * provide input string as stream
