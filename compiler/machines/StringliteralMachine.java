@@ -27,4 +27,8 @@ public class StringliteralMachine extends compiler.StateMachine {
   public String getStartState() {
     return "start";
   }
+
+  public compiler.TokenIntf.Type getType() {
+    return compiler.TokenIntf.Type.STRING;
+  }
 }
