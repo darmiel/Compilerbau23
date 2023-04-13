@@ -1,16 +1,9 @@
 package compiler;
 
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import compiler.machines.*;
 
-import compiler.machines.CharacterliteralMachine;
-import compiler.machines.DecimalMachine;
-import compiler.machines.IntegerMachine;
-import compiler.machines.KeywordMachine;
-import compiler.machines.ZeilenkommentarMachine;
-import compiler.machines.WhitespaceMachine;
+import java.io.OutputStreamWriter;
+import java.util.Vector;
 
 public class Lexer implements LexerIntf {
 
@@ -88,7 +81,7 @@ public class Lexer implements LexerIntf {
         addKeywordMachine("RETURN", compiler.TokenIntf.Type.RETURN);
         addKeywordMachine("BLOCK", compiler.TokenIntf.Type.BLOCK);
         addKeywordMachine("DEFAULT", compiler.TokenIntf.Type.DEFAULT);
-        
+
         // addMachine(new IdentifierMachine());
     }
 
@@ -97,7 +90,7 @@ public class Lexer implements LexerIntf {
     }
 
     public void addKeywordMachine(String keyword, TokenIntf.Type tokenType) {
-        m_machineList.add(new MachineInfo(new KeywordMachine(keyword)));
+        m_machineList.add(new MachineInfo(new KeywordMachine(keyword, tokenType)));
     }
 
     public void initMachines(String input) {
@@ -118,28 +111,56 @@ public class Lexer implements LexerIntf {
         // initialize machines
         initMachines(m_input.getRemaining());
 
-        // TODO begin
         // while some machine are in process
-           // increase counter
-           // for all remaining machines
-               // read next character
-               // check if machine is still in process
-               // if machine would accept
-                   // update last accept position
+        int counter = 0;
+        while (this.m_machineList.stream()
+                .map(i -> i.m_machine)
+                .anyMatch(m -> !m.isFinished())) {
+
+            // increase counter
+            counter++;
+
+            // for all remaining machines
+            for (final MachineInfo info : this.m_machineList) {
+                final StateMachineIntf machine = info.m_machine;
+                if (machine.isFinished()) {
+                    continue;
+                }
+                // read next character
+                machine.step();
+                // if machine would accept
+                // update last accept position
+                if (machine.isFinalState()) {
+                    info.m_acceptPos = counter;
+                }
+            }
+        }
         // end while some machines are in process
 
-        // select match
-        // for all machines
-            // look for maximum accept position
-            
+        // select match for all machines
+        // look for maximum accept position
+        MachineInfo max = null;
+        for (final MachineInfo info : m_machineList) {
+            if (max == null || info.m_acceptPos > max.m_acceptPos) {
+                max = info;
+            }
+        }
         // throw in case of error (best match has length 0)
+        if (max == null || max.m_acceptPos == 0) {
+            System.out.println("remaining: " + m_input.getRemaining() + ", acceptpos: " + max.m_acceptPos);
+            throw new Exception("cannot find matching machine for input");
+        }
 
         // set next word [start pos, final pos)
-        Token token = new Token();
-        // consume token from input
-        // fill in token info
+        final Token token = new Token();
+        token.m_type = max.m_machine.getType();
+        token.m_value = m_input.advanceAndGet(max.m_acceptPos);
+        token.m_firstCol = m_currentToken != null ? m_currentToken.m_lastCol + 1 : 0;
+        token.m_lastCol = token.m_firstCol + max.m_acceptPos;
 
-        // TODO end
+        // update current token
+        m_currentToken = token;
+
         return token;
     }
 
