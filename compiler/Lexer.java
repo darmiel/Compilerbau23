@@ -89,7 +89,7 @@ public class Lexer implements LexerIntf {
         addKeywordMachine("BLOCK", compiler.TokenIntf.Type.BLOCK);
         addKeywordMachine("DEFAULT", compiler.TokenIntf.Type.DEFAULT);
         
-        // addMachine(new IdentifierMachine());
+        addMachine(new compiler.machines.IdentifierMachine());
     }
 
     public void addMachine(StateMachineIntf machine) {
@@ -97,7 +97,7 @@ public class Lexer implements LexerIntf {
     }
 
     public void addKeywordMachine(String keyword, TokenIntf.Type tokenType) {
-        m_machineList.add(new MachineInfo(new KeywordMachine(keyword)));
+        m_machineList.add(new MachineInfo(new KeywordMachine(keyword, tokenType)));
     }
 
     public void initMachines(String input) {

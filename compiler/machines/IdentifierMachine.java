@@ -24,6 +24,9 @@ public class Identifier extends StateMachine{
         return "start";
     }
 
+    public compiler.TokenIntf.Type getType() {
+        return compiler.TokenIntf.Type.IDENT;
+    }
         //compiler.StateMachine identifier = new compiler.machines.Identifier();
     //identifier.process("aB5", outWriter);
     //identifier.process("_2cc", outWriter);
