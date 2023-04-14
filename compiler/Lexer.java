@@ -1,8 +1,6 @@
 package compiler;
 
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 import compiler.machines.CharacterliteralMachine;
@@ -12,7 +10,7 @@ import compiler.machines.KeywordMachine;
 import compiler.machines.ZeilenkommentarMachine;
 import compiler.machines.WhitespaceMachine;
 
-public class Lexer implements LexerIntf {
+public class Lexer implements LexerIntf, LexerParserIntf {
 
     static class MachineInfo {
 
