@@ -104,6 +104,12 @@ public class Lexer implements LexerIntf, LexerParserIntf {
         }
     }
 
+    public void init(String input) throws Exception {
+        m_input = new MultiLineInputReader(input);
+        m_currentToken = new Token();
+        advance();
+    }
+
     public Token nextWord() throws Exception {
         // check end of file
         if (m_input.isEmpty()) {
