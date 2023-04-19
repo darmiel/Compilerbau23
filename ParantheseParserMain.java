@@ -18,13 +18,13 @@ public class ParantheseParserMain {
 
     public static void parseS(compiler.Lexer lexer) throws Exception {
         compiler.Token currentToken = lexer.lookAhead();
-        if () {
+        /* if () {
             // S : (S)
         } else if () {
             // S : epsilon
         } else {
             lexer.throwCompilerException("invalid paranthese expression", "");
-        }
+        } */
     }
 
 }
