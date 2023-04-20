@@ -1,8 +1,6 @@
 package compiler;
 
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 import compiler.machines.CharacterliteralMachine;
@@ -12,7 +10,7 @@ import compiler.machines.KeywordMachine;
 import compiler.machines.ZeilenkommentarMachine;
 import compiler.machines.WhitespaceMachine;
 
-public class Lexer implements LexerIntf {
+public class Lexer implements LexerIntf, LexerParserIntf {
 
     static class MachineInfo {
 
@@ -89,7 +87,7 @@ public class Lexer implements LexerIntf {
         addKeywordMachine("BLOCK", compiler.TokenIntf.Type.BLOCK);
         addKeywordMachine("DEFAULT", compiler.TokenIntf.Type.DEFAULT);
         
-        // addMachine(new IdentifierMachine());
+        addMachine(new compiler.machines.IdentifierMachine());
     }
 
     public void addMachine(StateMachineIntf machine) {
@@ -97,13 +95,19 @@ public class Lexer implements LexerIntf {
     }
 
     public void addKeywordMachine(String keyword, TokenIntf.Type tokenType) {
-        m_machineList.add(new MachineInfo(new KeywordMachine(keyword)));
+        m_machineList.add(new MachineInfo(new KeywordMachine(keyword, tokenType)));
     }
 
     public void initMachines(String input) {
         for (MachineInfo machine : m_machineList) {
             machine.init(input);
         }
+    }
+
+    public void init(String input) throws Exception {
+        m_input = new MultiLineInputReader(input);
+        m_currentToken = new Token();
+        advance();
     }
 
     public Token nextWord() throws Exception {
@@ -114,32 +118,59 @@ public class Lexer implements LexerIntf {
             token.m_value = new String();
             return token;
         }
-
+        int curPos = 0;
         // initialize machines
         initMachines(m_input.getRemaining());
-
-        // TODO begin
         // while some machine are in process
-           // increase counter
-           // for all remaining machines
-               // read next character
-               // check if machine is still in process
-               // if machine would accept
-                   // update last accept position
-        // end while some machines are in process
-
-        // select match
-        // for all machines
-            // look for maximum accept position
-            
-        // throw in case of error (best match has length 0)
-
+        boolean machineActive;
+        do {
+            machineActive = false;
+            // for each machine in process
+            for (MachineInfo machine : m_machineList) {
+                if (machine.m_machine.isFinished()) {
+                    continue;
+                }
+                machineActive = true;
+                // next step
+                machine.m_machine.step();
+                // if possible final state
+                if (machine.m_machine.isFinalState()) {
+                    // update last position machine would accept
+                    machine.m_acceptPos = curPos + 1;
+                }
+            } // end for each machine in process
+            curPos++;
+        } while (machineActive); // end while some machine in process
+        // select first machine with largest final pos (greedy)
+        MachineInfo bestMatch = new MachineInfo(null);
+        for (MachineInfo machine : m_machineList) {
+            if (machine.m_acceptPos > bestMatch.m_acceptPos) {
+                bestMatch = machine;
+            }
+        }
+        // throw in case of error
+        if (bestMatch.m_machine == null) {
+            throw new CompilerException("Illegal token", m_input.getLine(), m_input.getMarkedCodeSnippetCurrentPos(), null);
+        }
         // set next word [start pos, final pos)
         Token token = new Token();
-        // consume token from input
-        // fill in token info
+        token.m_firstLine = m_input.getLine();
+        token.m_firstCol = m_input.getCol();
+        String nextWord = m_input.advanceAndGet(bestMatch.m_acceptPos);
+        token.m_lastLine = m_input.getLine();
+        token.m_lastCol = m_input.getCol();
+        token.m_type = bestMatch.m_machine.getType();
+        token.m_value = nextWord;
+        return token;
+    }
 
-        // TODO end
+    public Token nextToken() throws Exception {
+        Token token = nextWord();
+        while (token.m_type == Token.Type.WHITESPACE ||
+                token.m_type == Token.Type.MULTILINECOMMENT ||
+                token.m_type == Token.Type.LINECOMMENT) {
+            token = nextWord();
+        }
         return token;
     }
 
@@ -163,5 +194,37 @@ public class Lexer implements LexerIntf {
                 outStream.flush();
             }
         }
+    }
+
+    public Token lookAhead() {
+        return m_currentToken;
+    }
+
+    public void advance() throws Exception {
+        m_currentToken = nextToken();
+    }
+
+    public void expect(Token.Type tokenType) throws Exception {
+        if (tokenType == m_currentToken.m_type) {
+            advance();
+        } else {
+            throw new CompilerException(
+                    "Unexpected token " + m_currentToken.toString(),
+                    m_input.getLine(), m_input.getMarkedCodeSnippetCurrentPos(),
+                    Token.type2String(tokenType));
+        }
+    }
+
+    public boolean accept(Token.Type tokenType) throws Exception {
+        if (tokenType == m_currentToken.m_type) {
+            advance();
+            return true;
+        }
+        return false;
+    }
+    
+    public void throwCompilerException(String reason, String expected) throws Exception {
+        String codeSnippet = m_input.getMarkedCodeSnippet(m_currentToken.m_firstLine, m_currentToken.m_firstCol, m_currentToken.m_lastLine, m_currentToken.m_lastCol);
+        throw new CompilerException(reason, m_currentToken.m_firstLine, codeSnippet, expected);
     }
 }
