@@ -14,9 +14,7 @@ public class TestCaseContent {
     public void toStream(OutputStreamWriter outStream) throws Exception {
         outStream.write("Input:\n");
         outStream.write(m_input);
-        outStream.write("\n");
         outStream.write("Expected Output:\n");
         outStream.write(m_expectedOutput);
-        outStream.write("\n");
     }
 }
