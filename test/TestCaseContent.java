@@ -17,4 +17,12 @@ public class TestCaseContent {
         outStream.write("Expected Output:\n");
         outStream.write(m_expectedOutput);
     }
+
+    public String getInput() {
+        return m_input;
+    }
+
+    public String getExpectedOutput() {
+        return m_expectedOutput;
+    }
 }
