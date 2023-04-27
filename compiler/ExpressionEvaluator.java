@@ -28,7 +28,18 @@ public class ExpressionEvaluator {
     }
     
     int getPlusMinusExpr() throws Exception {
+        // sum : product (PLUS|MINUS product)*
         int result = getMulDivExpr();
+        while (m_lexer.lookAhead().m_type == compiler.TokenIntf.Type.PLUS ||
+            m_lexer.lookAhead().m_type == compiler.TokenIntf.Type.MINUS) {
+            if (m_lexer.lookAhead().m_type == compiler.TokenIntf.Type.PLUS) {
+                m_lexer.advance();
+                result += getMulDivExpr();
+            } else {
+                m_lexer.advance();
+                result -= getMulDivExpr();
+            }
+          }
         return result;
     }
 
