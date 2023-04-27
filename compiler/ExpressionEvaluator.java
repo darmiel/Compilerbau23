@@ -13,9 +13,10 @@ public class ExpressionEvaluator {
     }
     
     int getParantheseExpr() throws Exception {
-        Token curToken = m_lexer.lookAhead();
-        m_lexer.expect(Token.Type.INTEGER);
-        return Integer.valueOf(curToken.m_value);
+        m_lexer.expect(TokenIntf.Type.LPAREN);
+        int result = getQuestionMarkExpr();
+        m_lexer.expect(TokenIntf.Type.RPAREN);
+        return result;
     }
     
     int getUnaryExpr() throws Exception {
