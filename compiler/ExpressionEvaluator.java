@@ -73,25 +73,27 @@ public class ExpressionEvaluator {
     }
 
     int getQuestionMarkExpr() throws Exception {
-        int value1, value2;
+        TokenIntf.Type value;
+        int return_value1, return_value2;
         int andOrResult = getAndOrExpr();
 
         // Retrieve first value
-        m_lexer.advance();
         if (m_lexer.m_currentToken.m_type == TokenIntf.Type.QUESTIONMARK) {
             m_lexer.advance();
-            value1 = Integer.parseInt(m_lexer.m_currentToken.m_value);
+            value = m_lexer.m_currentToken.m_type;
+            return_value1 = getAndOrExpr();
         } else throw new Exception("expected ?");
 
         // Retrieve second value
         m_lexer.advance();
         if (m_lexer.m_currentToken.m_type == TokenIntf.Type.DOUBLECOLON) {
             m_lexer.advance();
-            value2 = Integer.parseInt(m_lexer.m_currentToken.m_value);
+            value = m_lexer.m_currentToken.m_type;
+            return_value2 = getAndOrExpr();
         } else throw new Exception("expected :");
 
         // Decide and return
         m_lexer.advance();
-        return andOrResult == 1 ? value1 : value2;
+        return andOrResult == 1 ? return_value1 : return_value2;
     }
 }
