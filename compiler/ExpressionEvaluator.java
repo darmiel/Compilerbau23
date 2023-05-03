@@ -104,7 +104,19 @@ public class ExpressionEvaluator {
         return result;
     }
 
+    /**
+     * Evaluates a question mark expression.
+     * questionMarkExpr -> andOrExpr ? andOrExpr : andOrExpr
+     *
+     * @return value1 if andOrResult equals 1 (true), else value2
+     */
     int getQuestionMarkExpr() throws Exception {
-        return getAndOrExpr();
+        int andOrResult = getAndOrExpr();
+        m_lexer.expect(TokenIntf.Type.QUESTIONMARK);
+        int value1 = getAndOrExpr();
+        m_lexer.expect(TokenIntf.Type.DOUBLECOLON);
+        int value2 = getAndOrExpr();
+
+        return andOrResult == 1 ? value1: value2;
     }
 }
