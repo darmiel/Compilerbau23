@@ -13,9 +13,17 @@ public class ExpressionEvaluator {
     }
     
     int getParantheseExpr() throws Exception {
-        m_lexer.expect(TokenIntf.Type.LPAREN);
-        int result = getQuestionMarkExpr();
-        m_lexer.expect(TokenIntf.Type.RPAREN);
+        int result = 0;
+        if(m_lexer.lookAhead().m_type == TokenIntf.Type.LPAREN) {
+            m_lexer.advance();
+            result = getQuestionMarkExpr();
+            m_lexer.expect(TokenIntf.Type.RPAREN);
+        }else if(m_lexer.lookAhead().m_type == TokenIntf.Type.INTEGER){
+            result = Integer.valueOf(m_lexer.lookAhead().m_value);
+            m_lexer.advance();
+        }else{
+            m_lexer.throwCompilerException("Unexpected Token", "LPAREN or INTEGER");
+        }
         return result;
     }
     
