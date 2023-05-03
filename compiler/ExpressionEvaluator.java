@@ -43,7 +43,19 @@ public class ExpressionEvaluator {
     }
 
     int getBitAndOrExpr() throws Exception {
-        return getPlusMinusExpr();
+        // |, &
+        int result = getPlusMinusExpr();
+        while(m_lexer.lookAhead().m_type == compiler.TokenIntf.Type.BITAND ||
+            m_lexer.lookAhead().m_type == compiler.TokenIntf.Type.BITOR){
+                if(m_lexer.lookAhead().m_type == compiler.TokenIntf.Type.BITAND){
+                    m_lexer.advance();
+                    result &= getPlusMinusExpr();
+                }else {
+                    m_lexer.advance();
+                    result|=getPlusMinusExpr();
+                }
+            }
+        return result;
     }
 
     int getShiftExpr() throws Exception {
