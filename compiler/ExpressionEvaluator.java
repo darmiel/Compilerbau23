@@ -90,7 +90,17 @@ public class ExpressionEvaluator {
     }
 
     int getAndOrExpr() throws Exception {
-        return getCompareExpr();
+        // and|or = compare (||&& compare)*
+        int result = getCompareExpr();
+        while(m_lexer.lookAhead().m_type == TokenIntf.Type.AND || m_lexer.lookAhead().m_type == TokenIntf.Type.OR) {
+            m_lexer.advance();
+            if(m_lexer.lookAhead().m_type == TokenIntf.Type.AND) {
+                result = (result > 0 && getCompareExpr() > 0) ? 1 : 0;
+            } else {
+                result = (result > 0 || getCompareExpr() > 0) ? 1 : 0;
+            }
+        }
+        return result;
     }
 
     int getQuestionMarkExpr() throws Exception {
