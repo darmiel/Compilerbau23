@@ -133,11 +133,15 @@ public class ExpressionEvaluator {
      */
     int getQuestionMarkExpr() throws Exception {
         int andOrResult = getAndOrExpr();
-        m_lexer.expect(TokenIntf.Type.QUESTIONMARK);
-        int value1 = getAndOrExpr();
-        m_lexer.expect(TokenIntf.Type.DOUBLECOLON);
-        int value2 = getAndOrExpr();
+        if (m_lexer.lookAhead().m_type == TokenIntf.Type.QUESTIONMARK) {
+          m_lexer.expect(TokenIntf.Type.QUESTIONMARK);
+          int value1 = getAndOrExpr();
+          m_lexer.expect(TokenIntf.Type.DOUBLECOLON);
+          int value2 = getAndOrExpr();
+          return andOrResult == 1 ? value1: value2;
+        } else {
+            return andOrResult;
+        }
 
-        return andOrResult == 1 ? value1: value2;
     }
 }
