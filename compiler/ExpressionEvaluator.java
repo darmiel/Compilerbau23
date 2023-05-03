@@ -86,7 +86,28 @@ public class ExpressionEvaluator {
     }
 
     int getCompareExpr() throws Exception {
-        return getShiftExpr();
+        // compare = shift (< > == shift)*
+        int result = getShiftExpr();
+        while (m_lexer.lookAhead().m_type == TokenIntf.Type.EQUAL ||
+                m_lexer.lookAhead().m_type == TokenIntf.Type.LESS ||
+                m_lexer.lookAhead().m_type == TokenIntf.Type.GREATER) {
+
+            if (m_lexer.lookAhead().m_type == TokenIntf.Type.EQUAL) {
+                m_lexer.advance();
+                result = (result == getShiftExpr()) ? 1 : 0;
+            }
+
+            if (m_lexer.lookAhead().m_type == TokenIntf.Type.LESS) {
+                m_lexer.advance();
+                result = (result < getShiftExpr()) ? 1 : 0;
+            }
+
+            if (m_lexer.lookAhead().m_type == TokenIntf.Type.GREATER) {
+                m_lexer.advance();
+                result = (result > getShiftExpr()) ? 1 : 0;
+            }
+        }
+        return result;
     }
 
     int getAndOrExpr() throws Exception {
