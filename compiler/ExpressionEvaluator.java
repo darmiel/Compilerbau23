@@ -72,28 +72,19 @@ public class ExpressionEvaluator {
         return getCompareExpr();
     }
 
+    /**
+     * Evaluates a question mark expression.
+     * questionMarkExpr -> andOrExpr ? andOrExpr : andOrExpr
+     *
+     * @return value1 if andOrResult equals 1 (true), else value2
+     */
     int getQuestionMarkExpr() throws Exception {
-        TokenIntf.Type value;
-        int return_value1, return_value2;
         int andOrResult = getAndOrExpr();
+        m_lexer.expect(TokenIntf.Type.QUESTIONMARK);
+        int value1 = getAndOrExpr();
+        m_lexer.expect(TokenIntf.Type.DOUBLECOLON);
+        int value2 = getAndOrExpr();
 
-        // Retrieve first value
-        if (m_lexer.m_currentToken.m_type == TokenIntf.Type.QUESTIONMARK) {
-            m_lexer.advance();
-            value = m_lexer.m_currentToken.m_type;
-            return_value1 = getAndOrExpr();
-        } else throw new Exception("expected ?");
-
-        // Retrieve second value
-        m_lexer.advance();
-        if (m_lexer.m_currentToken.m_type == TokenIntf.Type.DOUBLECOLON) {
-            m_lexer.advance();
-            value = m_lexer.m_currentToken.m_type;
-            return_value2 = getAndOrExpr();
-        } else throw new Exception("expected :");
-
-        // Decide and return
-        m_lexer.advance();
-        return andOrResult == 1 ? return_value1 : return_value2;
+        return andOrResult == 1 ? value1: value2;
     }
 }
