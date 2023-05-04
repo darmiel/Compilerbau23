@@ -50,6 +50,19 @@ public class Parser {
     }
 
     ASTExprNode getCompareExpr() throws Exception {
+        // plusMinusExpr: mulDivExpr ((PLUS|MINUS) mulDivExpr)*
+        ASTExprNode currentLhs = getShiftExpr();
+        while (m_lexer.lookAhead().m_type == TokenIntf.Type.LESS ||
+                m_lexer.lookAhead().m_type == TokenIntf.Type.GREATER ||
+                m_lexer.lookAhead().m_type == TokenIntf.Type.EQUAL
+                ) {
+            Token currentToken = m_lexer.lookAhead();
+            m_lexer.advance();
+            ASTExprNode currentRhs = getShiftExpr();
+            ASTExprNode currentResult = new ASTCompareExprNode(currentLhs, currentRhs, currentToken);
+            currentLhs = currentResult;
+        }
+        return currentLhs;
         return getShiftExpr();
     }
 
