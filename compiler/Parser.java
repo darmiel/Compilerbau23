@@ -57,7 +57,17 @@ public class Parser {
     }
 
     ASTExprNode getShiftExpr() throws Exception {
-        return getBitAndOrExpr();
+        // shiftExpr: bitAndOr ((<<|>>) bitAndOr)*
+        ASTExprNode currentLhs = getBitAndOrExpr();
+        while (m_lexer.lookAhead().m_type == TokenIntf.Type.SHIFTLEFT ||
+                m_lexer.lookAhead().m_type == TokenIntf.Type.SHIFTRIGHT) {
+            Token currentToken = m_lexer.lookAhead();
+            m_lexer.advance();
+            ASTExprNode currentRhs = getBitAndOrExpr();
+            ASTExprNode currentResult = new ASTShiftExprNode(currentLhs, currentRhs, currentToken);
+            currentLhs = currentResult;
+        }
+        return currentLhs;
     }
 
     ASTExprNode getCompareExpr() throws Exception {
