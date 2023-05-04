@@ -165,7 +165,7 @@ public class Parser {
         } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.PRINT) {
             return getPrintStmt();
         } else {
-            // throw new CompilerException();
+            m_lexer.throwCompilerException("Unexpected Statement", "");
         }
         return null;
     }
