@@ -35,7 +35,18 @@ public class Parser {
     }
     
     ASTExprNode getMulDivExpr() throws Exception {
-        return getUnaryExpr();
+        // return getUnaryExpr();
+        // MulDivExpr: UnaryExpr ((MUL|DIV) UnaryExpr)*
+        ASTExprNode currentLhs = getUnaryExpr();
+        while (m_lexer.lookAhead().m_type == TokenIntf.Type.MUL ||
+                m_lexer.lookAhead().m_type == TokenIntf.Type.DIV) {
+            Token currentToken = m_lexer.lookAhead();
+            m_lexer.advance();
+            ASTExprNode currentRhs = getUnaryExpr();
+            ASTExprNode currentResult = new ASTMulDivExprNode(currentLhs, currentRhs, currentToken);
+            currentLhs = currentResult;
+        }
+        return currentLhs;
     }
     
     ASTExprNode getPlusMinusExpr() throws Exception {
