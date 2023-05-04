@@ -65,6 +65,15 @@ public class Parser {
     }
 
     ASTExprNode getQuestionMarkExpr() throws Exception {
-        return getAndOrExpr();
+        ASTExprNode andOrResult = getAndOrExpr();
+        if (m_lexer.lookAhead().m_type == TokenIntf.Type.QUESTIONMARK) {
+            m_lexer.expect(TokenIntf.Type.QUESTIONMARK);
+            ASTExprNode value1 = getAndOrExpr();
+            m_lexer.expect(TokenIntf.Type.DOUBLECOLON);
+            ASTExprNode value2 = getAndOrExpr();
+            return new ASTQuestionMarkNode(andOrResult, value1, value2);
+        } else {
+            return andOrResult;
+        }
     }
 }
