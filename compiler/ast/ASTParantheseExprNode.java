@@ -1,6 +1,6 @@
 package compiler.ast;
 
-import compiler.Token;
+
 import compiler.TokenIntf;
 
 import java.io.OutputStreamWriter;

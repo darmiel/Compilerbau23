@@ -93,7 +93,6 @@ public class Parser {
             currentLhs = currentResult;
         }
         return currentLhs;
-        return getShiftExpr();
     }
 
     ASTExprNode getAndOrExpr() throws Exception {

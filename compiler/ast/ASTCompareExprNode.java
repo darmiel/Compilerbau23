@@ -7,8 +7,7 @@ import java.io.OutputStreamWriter;
 public class ASTCompareExprNode extends ASTExprNode {
     ASTExprNode m_lhs;
     ASTExprNode m_rhs;
-
-    m_token = token;
+    compiler.Token m_token;
 
     public ASTCompareExprNode(ASTExprNode lhs, ASTExprNode rhs, compiler.Token token) {
         m_lhs = lhs;
@@ -36,5 +35,6 @@ public class ASTCompareExprNode extends ASTExprNode {
         } else {
             result = lhsVal == rhsVal ? 1 : 0; //yas queen 💅
         }
+        return result;
     }
 }
