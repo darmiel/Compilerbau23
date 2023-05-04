@@ -14,9 +14,20 @@ public class Parser {
     }
     
     ASTExprNode getParantheseExpr() throws Exception {
-        Token curToken = m_lexer.lookAhead();
-        m_lexer.expect(Token.Type.INTEGER);
-        return new ASTIntegerLiteralNode(curToken.m_value);
+        // parantheseExpr: INT | ( LPAREN questionmarkExpr RPAREN )
+        ASTExprNode node = null;
+        if(m_lexer.lookAhead().m_type == TokenIntf.Type.INTEGER){
+            node = new ASTIntegerLiteralNode(m_lexer.lookAhead().m_value);
+            m_lexer.advance();
+        }else if(m_lexer.lookAhead().m_type == TokenIntf.Type.LPAREN) {
+            m_lexer.expect(TokenIntf.Type.LPAREN);
+            ASTExprNode innerNode = getQuestionMarkExpr();
+            node = new ASTParantheseExprNode(innerNode);
+            m_lexer.expect(TokenIntf.Type.RPAREN);
+        }else{
+            m_lexer.throwCompilerException("Unexpected Token", "LPAREN or INTEGER");
+        }
+        return node;
     }
     
     ASTExprNode getUnaryExpr() throws Exception {
