@@ -1,6 +1,6 @@
 import java.io.OutputStreamWriter;
 
-public class StamentParserMain {
+public class StatementParserMain {
 
     public static void main(String[] args) throws Exception {
         String program = compiler.InputReader.fileToString(args[0]);
