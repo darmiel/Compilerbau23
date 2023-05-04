@@ -3,16 +3,28 @@ import compiler.ast.*;
 
 public class Parser {
     private Lexer m_lexer;
+    private SymbolTableIntf m_symbolTable;
     
+    public Parser(Lexer lexer, SymbolTableIntf symbolTable) {
+        m_lexer = lexer;
+        m_symbolTable = symbolTable;
+    }
+
     public Parser(Lexer lexer) {
         m_lexer = lexer;
+        m_symbolTable = null;
     }
     
     public ASTExprNode parseExpression(String val) throws Exception {
         m_lexer.init(val);
         return getQuestionMarkExpr();
     }
-    
+
+    public ASTStmtNode parseStmt(String val) throws Exception {
+        m_lexer.init(val);
+        return getStmtList();
+    }
+
     ASTExprNode getParantheseExpr() throws Exception {
         // parantheseExpr: INT | ( LPAREN questionmarkExpr RPAREN )
         ASTExprNode node = null;
@@ -130,19 +142,19 @@ public class Parser {
         }
     }
 
-    ASTNode getAssignStmt() {
+    ASTStmtNode getAssignStmt() {
         return null;
     }
 
-    ASTNode getVarDeclareStmt() {
+    ASTStmtNode getVarDeclareStmt() {
         return null;
     }
 
-    ASTNode getPrintStmt() {
+    ASTStmtNode getPrintStmt() {
         return null;
     }
 
-    ASTNode getStmt() throws Exception {
+    ASTStmtNode getStmt() throws Exception {
         // stmt: assignStmt // SELECT = {IDENTIFIER}
         if (m_lexer.lookAhead().m_type == TokenIntf.Type.IDENT) {
             return getAssignStmt();
@@ -158,15 +170,15 @@ public class Parser {
         return null;
     }
 
-    ASTNode getStmtList() throws Exception {
+    ASTStmtNode getStmtList() throws Exception {
         // stmtlist: stmt stmtlist // SELECT = {IDENTIFIER, DECLARE, PRINT}
         // stmtlist: eps // SELECT = {EOF}
         // stmtlist: (stmt)* // TERMINATE on EOF
-        // ASTStmtListNode stmtList 
+        ASTBlockStmtNode stmtList = new ASTBlockStmtNode();
         while (m_lexer.lookAhead().m_type != TokenIntf.Type.EOF) {
-            ASTNode currentStmt = getStmt();
-            // stmtList.addStmt(currentStmt);
+            ASTStmtNode currentStmt = getStmt();
+            stmtList.addStatement(currentStmt);
         }
-        return null;
+        return stmtList;
     }
 }
