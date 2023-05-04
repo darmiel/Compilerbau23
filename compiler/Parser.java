@@ -41,8 +41,17 @@ public class Parser {
         return currentLhs;
     }
 
-    ASTExprNode getBitAndOrExpr() throws Exception {
-        return getPlusMinusExpr();
+    ASTExprNode getBitAndOrExpr() throws Exception {        
+        ASTExprNode currentLhs = getPlusMinusExpr();
+        while (m_lexer.lookAhead().m_type == TokenIntf.Type.BITAND ||
+                m_lexer.lookAhead().m_type == TokenIntf.Type.BITOR) {
+            Token currentToken = m_lexer.lookAhead();
+            m_lexer.advance();
+            ASTExprNode currentRhs = getPlusMinusExpr();
+            ASTExprNode currentResult = new ASTBitAndOr(currentLhs, currentRhs, currentToken);
+            currentLhs = currentResult;
+        }
+        return currentLhs;
     }
 
     ASTExprNode getShiftExpr() throws Exception {
