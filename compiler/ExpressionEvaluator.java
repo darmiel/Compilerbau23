@@ -32,7 +32,18 @@ public class ExpressionEvaluator {
     }
     
     int getMulDivExpr() throws Exception {
-        return getUnaryExpr();
+        int result = getUnaryExpr();
+        while (m_lexer.lookAhead().m_type == TokenIntf.Type.MUL ||
+            m_lexer.lookAhead().m_type == TokenIntf.Type.DIV) {
+            if (m_lexer.lookAhead().m_type == TokenIntf.Type.MUL) {
+                m_lexer.advance();
+                result *= getUnaryExpr();
+            } else {
+                m_lexer.advance();
+                result /= getUnaryExpr();
+            }
+        }
+        return result;
     }
     
     int getPlusMinusExpr() throws Exception {
