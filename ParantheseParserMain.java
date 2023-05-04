@@ -9,7 +9,7 @@ public class ParantheseParserMain {
         compiler.Lexer lexer = new compiler.Lexer();
         OutputStreamWriter outStream = new OutputStreamWriter(System.out, "UTF-8");
 
-        lexer.init("((()))");
+        lexer.init("(())");
         parseS(lexer);
         if (lexer.lookAhead().m_type == compiler.TokenIntf.Type.EOF) {
             outStream.write("ACCEPTED");
