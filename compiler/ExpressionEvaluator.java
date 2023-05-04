@@ -28,7 +28,17 @@ public class ExpressionEvaluator {
     }
     
     int getUnaryExpr() throws Exception {
-        return getParantheseExpr();
+        // !, - exp: (-|!)? parantheseExpression
+        int result = 0;
+        if(m_lexer.lookAhead().m_type == TokenIntf.Type.MINUS){
+            m_lexer.advance();
+            result = - getParantheseExpr();
+        }else if(m_lexer.lookAhead().m_type == TokenIntf.Type.NOT){
+            m_lexer.advance();
+            result = getParantheseExpr() == 0 ? 1 : 0;
+        }else {result = getParantheseExpr();}
+
+        return result;
     }
     
     int getMulDivExpr() throws Exception {

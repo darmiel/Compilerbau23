@@ -59,14 +59,43 @@ public class Parser {
     }
 
     ASTExprNode getCompareExpr() throws Exception {
+        // plusMinusExpr: mulDivExpr ((PLUS|MINUS) mulDivExpr)*
+        ASTExprNode currentLhs = getShiftExpr();
+        while (m_lexer.lookAhead().m_type == TokenIntf.Type.LESS ||
+                m_lexer.lookAhead().m_type == TokenIntf.Type.GREATER ||
+                m_lexer.lookAhead().m_type == TokenIntf.Type.EQUAL
+                ) {
+            Token currentToken = m_lexer.lookAhead();
+            m_lexer.advance();
+            ASTExprNode currentRhs = getShiftExpr();
+            ASTExprNode currentResult = new ASTCompareExprNode(currentLhs, currentRhs, currentToken);
+            currentLhs = currentResult;
+        }
+        return currentLhs;
         return getShiftExpr();
     }
 
     ASTExprNode getAndOrExpr() throws Exception {
-        return getCompareExpr();
+        ASTExprNode currentLhs = getCompareExpr();
+        while (m_lexer.lookAhead().m_type == TokenIntf.Type.AND || m_lexer.lookAhead().m_type == TokenIntf.Type.OR) {
+            final Token currentToken = m_lexer.lookAhead();
+            m_lexer.advance();
+            final ASTExprNode currentRhs = getCompareExpr();
+            currentLhs = new ASTAndOrExprNode(currentLhs, currentRhs, currentToken);
+        }
+        return currentLhs;
     }
 
     ASTExprNode getQuestionMarkExpr() throws Exception {
-        return getAndOrExpr();
+        ASTExprNode andOrResult = getAndOrExpr();
+        if (m_lexer.lookAhead().m_type == TokenIntf.Type.QUESTIONMARK) {
+            m_lexer.expect(TokenIntf.Type.QUESTIONMARK);
+            ASTExprNode value1 = getAndOrExpr();
+            m_lexer.expect(TokenIntf.Type.DOUBLECOLON);
+            ASTExprNode value2 = getAndOrExpr();
+            return new ASTQuestionMarkNode(andOrResult, value1, value2);
+        } else {
+            return andOrResult;
+        }
     }
 }
