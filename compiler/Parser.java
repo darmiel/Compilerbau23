@@ -129,4 +129,44 @@ public class Parser {
             return andOrResult;
         }
     }
+
+    ASTNode getAssignStmt() {
+        return null;
+    }
+
+    ASTNode getVarDeclareStmt() {
+        return null;
+    }
+
+    ASTNode getPrintStmt() {
+        return null;
+    }
+
+    ASTNode getStmt() throws Exception {
+        // stmt: assignStmt // SELECT = {IDENTIFIER}
+        if (m_lexer.lookAhead().m_type == TokenIntf.Type.IDENT) {
+            return getAssignStmt();
+        //    stmt: varDeclareStmt // SELECT = {DECLARE}
+        } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.DECLARE) {
+            return getVarDeclareStmt();
+        //    stmt: printStmt // SELECT = {PRINT}
+        } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.PRINT) {
+            return getPrintStmt();
+        } else {
+            // throw new CompilerException();
+        }
+        return null;
+    }
+
+    ASTNode getStmtList() throws Exception {
+        // stmtlist: stmt stmtlist // SELECT = {IDENTIFIER, DECLARE, PRINT}
+        // stmtlist: eps // SELECT = {EOF}
+        // stmtlist: (stmt)* // TERMINATE on EOF
+        // ASTStmtListNode stmtList 
+        while (m_lexer.lookAhead().m_type != TokenIntf.Type.EOF) {
+            ASTNode currentStmt = getStmt();
+            // stmtList.addStmt(currentStmt);
+        }
+        return null;
+    }
 }
