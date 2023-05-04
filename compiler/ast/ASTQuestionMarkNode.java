@@ -17,7 +17,7 @@ public class ASTQuestionMarkNode extends ASTExprNode {
     @Override
     public void print(OutputStreamWriter outStream, String indent) throws Exception {
         outStream.write(indent);
-        outStream.write("?");
+        outStream.write("?\n");
         cond.print(outStream, indent + "  ");
         value1.print(outStream, indent + "  ");
         value2.print(outStream, indent + "  ");
