@@ -28,8 +28,17 @@ public class Parser {
     }
     
     ASTExprNode getPlusMinusExpr() throws Exception {
-        ASTExprNode result = getMulDivExpr();
-        return result;
+        // plusMinusExpr: mulDivExpr ((PLUS|MINUS) mulDivExpr)*
+        ASTExprNode currentLhs = getMulDivExpr();
+        while (m_lexer.lookAhead().m_type == TokenIntf.Type.PLUS ||
+                m_lexer.lookAhead().m_type == TokenIntf.Type.MINUS) {
+            Token currentToken = m_lexer.lookAhead();
+            m_lexer.advance();
+            ASTExprNode currentRhs = getMulDivExpr();
+            ASTExprNode currentResult = new ASTPlusMinusExprNode(currentLhs, currentRhs, currentToken);
+            currentLhs = currentResult;
+        }
+        return currentLhs;
     }
 
     ASTExprNode getBitAndOrExpr() throws Exception {
