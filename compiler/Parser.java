@@ -3,6 +3,7 @@ import compiler.ast.*;
 
 public class Parser {
     private Lexer m_lexer;
+    private SymbolTable m_symbolTable = new SymbolTable();
     
     public Parser(Lexer lexer) {
         m_lexer = lexer;
@@ -123,8 +124,18 @@ public class Parser {
         return null;
     }
 
-    ASTNode getVarDeclareStmt() {
-        return null;
+    ASTNode getVarDeclareStmt() throws Exception {
+        m_lexer.expect(TokenIntf.Type.DECLARE);
+
+        Token identifier = m_lexer.lookAhead();
+        if (m_symbolTable.getSymbol(identifier.m_value) != null) {
+            m_lexer.throwCompilerException("Identifier already declared previously", "");
+        } else {
+            m_symbolTable.createSymbol(identifier.m_value);
+        }
+
+        m_lexer.advance();
+        return new ASTDeclareStmt(identifier);
     }
 
     ASTNode getPrintStmt() {
