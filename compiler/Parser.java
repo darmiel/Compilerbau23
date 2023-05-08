@@ -142,6 +142,16 @@ public class Parser {
         }
     }
 
+    /**
+     * Returns the value of the current token (a variable identifier) as an int.
+     * Throws an exception if the token is not yet stored in the symbol table.
+     *
+     * @return value of current token
+     */
+    int getVariableExpr() {
+        return m_symbolTable.getSymbol(m_lexer.lookAhead().m_value).m_number;
+    }
+
     ASTStmtNode getAssignStmt() {
         return null;
     }
