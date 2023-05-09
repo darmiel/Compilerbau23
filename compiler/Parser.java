@@ -146,8 +146,18 @@ public class Parser {
         return null;
     }
 
-    ASTStmtNode getVarDeclareStmt() {
-        return null;
+    ASTStmtNode getVarDeclareStmt() throws Exception {
+        m_lexer.expect(TokenIntf.Type.DECLARE);
+
+        Token identifier = m_lexer.lookAhead();
+        if (m_symbolTable.getSymbol(identifier.m_value) != null) {
+            m_lexer.throwCompilerException("Identifier already declared previously", "");
+        } else {
+            m_symbolTable.createSymbol(identifier.m_value);
+        }
+
+        m_lexer.advance();
+        return new ASTDeclareStmt(identifier);
     }
 
     ASTStmtNode getPrintStmt() {
