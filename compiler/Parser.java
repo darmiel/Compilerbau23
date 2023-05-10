@@ -188,7 +188,6 @@ public class Parser {
 
     ASTStmtNode getPrintStmt() throws Exception{
         m_lexer.expect(TokenIntf.Type.PRINT);
-        m_lexer.advance();
         ASTExprNode exprNode = getQuestionMarkExpr();
         if(m_lexer.lookAhead().m_type == TokenIntf.Type.SEMICOLON){
             m_lexer.advance();
