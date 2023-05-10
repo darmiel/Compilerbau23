@@ -1,4 +1,5 @@
 package compiler;
+import compiler.TokenIntf.Type;
 import compiler.ast.*;
 
 public class Parser {
@@ -154,8 +155,21 @@ public class Parser {
         return new ASTVariableExprNode(symbol);
     }
 
-    ASTStmtNode getAssignStmt() {
-        return null;
+    ASTStmtNode getAssignStmt() throws Exception {
+        // assignStmt: IDENTIFIER ASSIGN expr
+        // bsp: a = 5 + 2
+        Token nextToken = m_lexer.lookAhead();
+        m_lexer.expect(TokenIntf.Type.IDENT);
+
+        Symbol symbol = m_symbolTable.getSymbol(nextToken.m_value);
+        if (symbol == null) {
+            this.m_lexer.throwCompilerException("variable not defined", "");
+        }
+
+        m_lexer.expect(TokenIntf.Type.ASSIGN);
+        ASTExprNode expression = getQuestionMarkExpr();
+
+        return new ASTAssignStmt(symbol, expression);
     }
 
     ASTStmtNode getVarDeclareStmt() throws Exception {
