@@ -5,8 +5,8 @@ import compiler.Symbol;
 import java.io.OutputStreamWriter;
 
 public class ASTAssignStmt extends ASTStmtNode {
-    public final Symbol symbol;
-    public final ASTExprNode expression;
+    private final Symbol symbol;
+    private final ASTExprNode expression;
 
     public ASTAssignStmt(Symbol symbol, ASTExprNode expression) {
         this.symbol = symbol;
