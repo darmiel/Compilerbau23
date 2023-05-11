@@ -24,4 +24,9 @@ public class ASTPrintStmtNode extends ASTStmtNode {
         System.out.println(expression.eval());
     }
 
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
+        expression.codegen(env);
+        return null; 
+    }
+
 }
