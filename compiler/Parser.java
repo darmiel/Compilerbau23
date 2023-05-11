@@ -47,7 +47,19 @@ public class Parser {
     }
     
     ASTExprNode getUnaryExpr() throws Exception {
-        return getParantheseExpr();
+        // !, - exp: (-|!)* parantheseExpression
+        ASTExprNode result = null;
+        if(m_lexer.lookAhead().m_type == TokenIntf.Type.MINUS ||
+              m_lexer.lookAhead().m_type == TokenIntf.Type.NOT){
+                Token currentToken = m_lexer.lookAhead();
+                m_lexer.advance();
+                ASTExprNode unary = getUnaryExpr();
+                result = new ASTUnaryExprNode(unary, currentToken);
+              }
+              else {
+                result = getParantheseExpr();
+              }
+        return result;
     }
     
     ASTExprNode getMulDivExpr() throws Exception {
