@@ -143,13 +143,12 @@ public class Parser {
     }
 
     /**
-     * Returns the value of the current token (a variable identifier) as an int.
-     * Throws an exception if the token is not yet stored in the symbol table.
+     * Creates a new ASTVariableExprNode object containing information about the current token
      *
-     * @return value of current token
+     * @return ASTVariableExprNode
      */
-    int getVariableExpr() {
-        return m_symbolTable.getSymbol(m_lexer.lookAhead().m_value).m_number;
+    ASTVariableExprNode getVariableExpr() {
+        return new ASTVariableExprNode(m_lexer.lookAhead(), m_symbolTable);
     }
 
     ASTStmtNode getAssignStmt() {
