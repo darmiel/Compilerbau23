@@ -22,4 +22,17 @@ public class ASTIntegerLiteralNode extends ASTExprNode {
         return Integer.valueOf(m_value);
     }
 
+
+    @Override
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
+        // create instruction object
+        // pass instruction objects of childs
+        // as input arguments
+        compiler.InstrIntf instr = new compiler.instr.InstrIntegerLiteral(Integer.valueOf(m_value));
+
+        // add instruction to current code block
+        env.addInstr(instr);
+        return instr;
+    }
+
 }
