@@ -1,6 +1,6 @@
-{
+
   DECLARE a;
   a = 0;
   DECLARE b;
-  b = !(!(!a)) ? 5 : 7; PRINT b;
-}
+  b = 7+2; 
+  PRINT b*2;

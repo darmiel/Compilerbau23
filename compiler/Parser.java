@@ -1,4 +1,5 @@
 package compiler;
+import compiler.TokenIntf.Type;
 import compiler.ast.*;
 
 public class Parser {
@@ -31,6 +32,9 @@ public class Parser {
         if(m_lexer.lookAhead().m_type == TokenIntf.Type.INTEGER){
             node = new ASTIntegerLiteralNode(m_lexer.lookAhead().m_value);
             m_lexer.advance();
+        } else if (this.m_lexer.lookAhead().m_type == TokenIntf.Type.IDENT) {
+            node = this.getVariableExpr();
+            this.m_lexer.advance();
         }else if(m_lexer.lookAhead().m_type == TokenIntf.Type.LPAREN) {
             m_lexer.expect(TokenIntf.Type.LPAREN);
             ASTExprNode innerNode = getQuestionMarkExpr();
@@ -142,21 +146,50 @@ public class Parser {
         }
     }
 
-    ASTStmtNode getAssignStmt() {
-        return null;
+    ASTExprNode getVariableExpr() throws Exception {
+        final Token token = this.m_lexer.lookAhead();
+        final Symbol symbol = this.m_symbolTable.getSymbol(token.m_value);
+        if (symbol == null) {
+            this.m_lexer.throwCompilerException("variable not defined", "");
+        }
+        return new ASTVariableExprNode(symbol);
     }
 
-    ASTStmtNode getVarDeclareStmt() {
-        return null;
+    ASTStmtNode getAssignStmt() throws Exception {
+        // assignStmt: IDENTIFIER ASSIGN expr
+        // bsp: a = 5 + 2
+        Token nextToken = m_lexer.lookAhead();
+        m_lexer.expect(TokenIntf.Type.IDENT);
+
+        Symbol symbol = m_symbolTable.getSymbol(nextToken.m_value);
+        if (symbol == null) {
+            this.m_lexer.throwCompilerException("variable not defined", "");
+        }
+
+        m_lexer.expect(TokenIntf.Type.ASSIGN);
+        ASTExprNode expression = getQuestionMarkExpr();
+        m_lexer.expect(TokenIntf.Type.SEMICOLON);
+        return new ASTAssignStmt(symbol, expression);
+    }
+
+    ASTStmtNode getVarDeclareStmt() throws Exception {
+        m_lexer.expect(TokenIntf.Type.DECLARE);
+
+        Token identifier = m_lexer.lookAhead();
+        if (m_symbolTable.getSymbol(identifier.m_value) != null) {
+            m_lexer.throwCompilerException("Identifier already declared previously", "");
+        } else {
+            m_symbolTable.createSymbol(identifier.m_value);
+        }
+        m_lexer.advance();
+        m_lexer.expect(TokenIntf.Type.SEMICOLON);
+        return new ASTDeclareStmt(identifier);
     }
 
     ASTStmtNode getPrintStmt() throws Exception{
         m_lexer.expect(TokenIntf.Type.PRINT);
-        m_lexer.advance();
         ASTExprNode exprNode = getQuestionMarkExpr();
-        if(m_lexer.lookAhead().m_type == TokenIntf.Type.SEMICOLON){
-            m_lexer.advance();
-        }
+        m_lexer.expect(TokenIntf.Type.SEMICOLON);
         return new ASTPrintStmtNode(exprNode);
         
     }
