@@ -1,5 +1,7 @@
 package compiler.ast;
 
+import compiler.CompileEnvIntf;
+import compiler.InstrIntf;
 import compiler.Symbol;
 
 import java.io.OutputStreamWriter;
@@ -23,5 +25,12 @@ public class ASTAssignStmt extends ASTStmtNode {
     @Override
     public void execute() {
         this.symbol.m_number = this.expression.eval();
+    }
+
+    public InstrIntf codegen(CompileEnvIntf env) {
+        InstrIntf expInstr = expression.codegen(env);
+        InstrIntf instr = new compiler.instr.InstrAssignStmt(symbol, expInstr);
+        env.addInstr(instr);
+        return instr;
     }
 }
