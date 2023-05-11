@@ -1,7 +1,10 @@
 package compiler.ast;
 
 
+import compiler.CompileEnvIntf;
+import compiler.InstrIntf;
 import compiler.TokenIntf;
+import org.w3c.dom.xpath.XPathResult;
 
 import java.io.OutputStreamWriter;
 
@@ -23,5 +26,13 @@ public class ASTParantheseExprNode extends ASTExprNode{
     @Override
     public int eval() {
         return inner.eval();
+    }
+
+    @Override
+    public InstrIntf codegen(CompileEnvIntf env) {
+        compiler.InstrIntf innerInstruction = inner.codegen(env);
+        compiler.InstrIntf parantheseInstr = new compiler.instr.InstrParanthese(innerInstruction);
+        env.addInstr(parantheseInstr);
+        return parantheseInstr;
     }
 }
