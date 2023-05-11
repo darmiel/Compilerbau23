@@ -36,7 +36,7 @@ public class ASTMulDivExprNode extends ASTExprNode{
         return result;
     }
 
-    compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
         compiler.InstrIntf lhs = m_lhs.codegen(env);
         compiler.InstrIntf rhs = m_rhs.codegen(env);
         compiler.InstrIntf instr = new compiler.instr.InstrMulDiv(m_token.m_type, lhs, rhs);
