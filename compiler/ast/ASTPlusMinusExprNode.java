@@ -34,7 +34,7 @@ public class ASTPlusMinusExprNode extends ASTExprNode {
         return result;
     }
 
-    compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
         compiler.InstrIntf lhs = m_lhs.codegen(env);
         compiler.InstrIntf rhs = m_rhs.codegen(env);
         compiler.InstrIntf instr = new compiler.instr.InstrPlusMinus(m_token.m_type, lhs, rhs);
