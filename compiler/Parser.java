@@ -168,7 +168,7 @@ public class Parser {
 
         m_lexer.expect(TokenIntf.Type.ASSIGN);
         ASTExprNode expression = getQuestionMarkExpr();
-
+        m_lexer.expect(TokenIntf.Type.SEMICOLON);
         return new ASTAssignStmt(symbol, expression);
     }
 
@@ -181,17 +181,15 @@ public class Parser {
         } else {
             m_symbolTable.createSymbol(identifier.m_value);
         }
-
         m_lexer.advance();
+        m_lexer.expect(TokenIntf.Type.SEMICOLON);
         return new ASTDeclareStmt(identifier);
     }
 
     ASTStmtNode getPrintStmt() throws Exception{
         m_lexer.expect(TokenIntf.Type.PRINT);
         ASTExprNode exprNode = getQuestionMarkExpr();
-        if(m_lexer.lookAhead().m_type == TokenIntf.Type.SEMICOLON){
-            m_lexer.advance();
-        }
+        m_lexer.expect(TokenIntf.Type.SEMICOLON);
         return new ASTPrintStmtNode(exprNode);
         
     }
