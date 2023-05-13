@@ -1,7 +1,5 @@
 package compiler;
 
-import compiler.ast.Tuple;
-
 import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.ListIterator;
@@ -12,23 +10,22 @@ public interface ExecutionEnvIntf {
 	/**
 	 *  push temporary on value stack
 	 */
-    public void push(Tuple<String, Integer> argument);
+    public void push(int argument);
     
     /**
      *  pop (consume) temporary from value stack	
      */
-	public Tuple<String, Integer> pop();
+	public int pop();
 	/**
 	 *  push function on execution stack
 	 */
-	public void pushFunction(FunctionInfo function, List<InstrIntf> args);
+	public void pushReturnAddr(ListIterator<InstrIntf> instrIter);
 	/**
 	 * pop function from execution stack
 	 */
-	public void popFunction();
+	public ListIterator<InstrIntf> popReturnAddr();
     
-    public List<Tuple<String, Integer>> getCurrentArgs();
-	/**
+    /**
 	 *  get symbol from symbol table
 	 */
 	public Symbol getSymbol(String symbolName);
