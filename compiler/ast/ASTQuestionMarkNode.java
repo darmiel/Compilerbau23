@@ -27,4 +27,15 @@ public class ASTQuestionMarkNode extends ASTExprNode {
     public int eval() {
         return this.cond.eval() == 1 ? this.value1.eval() : this.value2.eval();
     }
+
+    @Override
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
+        compiler.InstrIntf instrCond = this.cond.codegen(env);
+        compiler.InstrIntf instrValue1 = this.value1.codegen(env);
+        compiler.InstrIntf instrValue2 = this.value2.codegen(env);
+        compiler.InstrIntf instr = new compiler.instr.InstrQuestionMarkExpr(instrCond, instrValue1, instrValue2);
+        env.addInstr(instr);
+        return instr;
+    }
+
 }
