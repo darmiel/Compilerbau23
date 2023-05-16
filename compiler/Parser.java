@@ -187,11 +187,7 @@ public class Parser {
         m_lexer.expect(TokenIntf.Type.DECLARE);
 
         Token identifier = m_lexer.lookAhead();
-        if (m_symbolTable.getSymbol(identifier.m_value) != null) {
-            m_lexer.throwCompilerException("Identifier already declared previously", "");
-        } else {
-            m_symbolTable.createSymbol(identifier.m_value);
-        }
+        declareVar(identifier);
         m_lexer.advance();
         return new ASTDeclareStmt(identifier);
     }
@@ -216,6 +212,10 @@ public class Parser {
         //    stmt: blockStmt // SELECT = {LBRACE}
         } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.LBRACE) {
             return getBlockStmt();
+        } else if(m_lexer.lookAhead().m_type == Type.RETURN) {
+            return getReturnStmt();
+        } else if(m_lexer.lookAhead().m_type == Type.FUNCTION) {
+            return getFunctionStmt();
         } else {
             m_lexer.throwCompilerException("Unexpected Statement", "");
         }
@@ -247,4 +247,53 @@ public class Parser {
       return new ASTBlockStmtNode(stmtListNode);
     }
 
+    ASTStmtNode getFunctionStmt() throws Exception {
+        // functionStmt: FUNCTION INDENTIFIER LPAREN parameterList RPAREN blockStmt
+        m_lexer.expect(Type.FUNCTION);
+        Token functionIdentifier = m_lexer.lookAhead();
+        m_lexer.expect(Type.IDENT);
+
+        Symbol functionSymbol = declareVar(functionIdentifier);
+
+        m_lexer.expect(Type.LPAREN);
+        ASTParameterListNode parameters = getParameterList();
+        m_lexer.expect(Type.RPAREN);
+        ASTStmtNode functionBody = getBlockStmt();
+
+        return new ASTFunctionStmtNode(functionSymbol, parameters, functionBody);
+    }
+
+    ASTParameterListNode getParameterList() throws Exception {
+        // parameterList: IDENTIFIER (COMMA IDENTIFIER)*	SELECT(parameterList) = { IDENTIFIER }
+        // parameterList: eps		TERMINATE ON FOLLOW(parameterList) = { RPAREN }
+        ASTParameterListNode parameterList = new ASTParameterListNode();
+        if(m_lexer.lookAhead().m_type == Type.RPAREN) {
+            return parameterList;
+        }
+        Token currentIdentifier = m_lexer.lookAhead();
+        m_lexer.expect(Type.IDENT);
+        parameterList.addParameter(declareVar(currentIdentifier));
+        while(m_lexer.lookAhead().m_type == Type.COMMA) {
+            m_lexer.expect(Type.COMMA);
+            currentIdentifier = m_lexer.lookAhead();
+            m_lexer.expect(Type.IDENT);
+            parameterList.addParameter(declareVar(currentIdentifier));
+        }
+        return parameterList;
+    }
+
+    ASTStmtNode getReturnStmt() throws Exception {
+        // returnStmt: RETURN expression
+        m_lexer.expect(Type.RETURN);
+        ASTExprNode expression = getQuestionMarkExpr();
+        return new ASTReturnStmt(expression);
+    }
+
+    Symbol declareVar(Token identifier) throws Exception {
+        if (m_symbolTable.getSymbol(identifier.m_value) != null) {
+            m_lexer.throwCompilerException("Identifier already declared previously", "");
+            return null;
+        }
+        return m_symbolTable.createSymbol(identifier.m_value);
+    }
 }
