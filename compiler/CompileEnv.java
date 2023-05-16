@@ -86,7 +86,8 @@ public class CompileEnv implements CompileEnvIntf {
     }
 
     public InstrBlock createBlock(String name) {
-        InstrBlock newBlock = new InstrBlock(name);
+        InstrBlock newBlock = new InstrBlock(name + "_" + Integer.toString(m_nextBlockId));
+        m_nextBlockId++;
         m_blockList.add(newBlock);
         return newBlock;
     }
