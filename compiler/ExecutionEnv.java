@@ -13,11 +13,11 @@ public class ExecutionEnv implements ExecutionEnvIntf {
     private FunctionTable m_functionTable;
     private boolean m_trace;
 
-    public ExecutionEnv(FunctionTable functionTable, SymbolTable symbolTable, OutputStream outStream, boolean trace) throws Exception {
+    public ExecutionEnv(FunctionTable functionTable, SymbolTable symbolTable, OutputStreamWriter outStream, boolean trace) throws Exception {
 		m_symbolTable = symbolTable;
 		m_valueStack = new Stack<Integer>();
 		m_returnAddrStack = new Stack<ListIterator<InstrIntf>>();
-		m_outStream = new OutputStreamWriter(outStream, "UTF-8");
+		m_outStream = outStream;
 		m_functionTable = functionTable;
 		m_trace = trace;
 	}
