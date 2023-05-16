@@ -1,6 +1,2 @@
 
-  DECLARE a;
-  a = 0;
-  DECLARE b;
-  b = 7+2; 
-  PRINT b*2;
+PRINT 5+2;
