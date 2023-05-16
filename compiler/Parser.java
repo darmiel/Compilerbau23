@@ -5,7 +5,14 @@ import compiler.ast.*;
 public class Parser {
     private Lexer m_lexer;
     private SymbolTableIntf m_symbolTable;
+    private FunctionTableIntf m_functionTable;
     
+    public Parser(Lexer lexer, SymbolTableIntf symbolTable, FunctionTableIntf functionTable) {
+        m_lexer = lexer;
+        m_symbolTable = symbolTable;
+        m_functionTable = functionTable;
+    }
+
     public Parser(Lexer lexer, SymbolTableIntf symbolTable) {
         m_lexer = lexer;
         m_symbolTable = symbolTable;
@@ -247,20 +254,28 @@ public class Parser {
       return new ASTBlockStmtNode(stmtListNode);
     }
 
+    ASTStmtNode getFunctionBodyStmt() throws Exception {
+        // functionBody: LBRACE stmtlist RBRACE
+        m_lexer.expect(TokenIntf.Type.LBRACE);
+      ASTStmtNode stmtListNode = getStmtList();
+      m_lexer.expect(TokenIntf.Type.RBRACE);
+      return new ASTFunctionBodyStmtNode(stmtListNode);
+    }
+
     ASTStmtNode getFunctionStmt() throws Exception {
         // functionStmt: FUNCTION INDENTIFIER LPAREN parameterList RPAREN blockStmt
         m_lexer.expect(Type.FUNCTION);
         Token functionIdentifier = m_lexer.lookAhead();
         m_lexer.expect(Type.IDENT);
 
-        Symbol functionSymbol = declareVar(functionIdentifier);
+        FunctionInfo functionInfo = declareFunction(functionIdentifier);
 
         m_lexer.expect(Type.LPAREN);
         ASTParameterListNode parameters = getParameterList();
         m_lexer.expect(Type.RPAREN);
-        ASTStmtNode functionBody = getBlockStmt();
+        ASTStmtNode functionBody = getFunctionBodyStmt();
 
-        return new ASTFunctionStmtNode(functionSymbol, parameters, functionBody);
+        return new ASTFunctionStmtNode(functionInfo, parameters, functionBody);
     }
 
     ASTParameterListNode getParameterList() throws Exception {
@@ -295,5 +310,14 @@ public class Parser {
             return null;
         }
         return m_symbolTable.createSymbol(identifier.m_value);
+    }
+    
+    FunctionInfo declareFunction(Token identifier) throws Exception {
+        if(m_functionTable.getFunction(identifier.m_value) != null) {
+            m_lexer.throwCompilerException("Function already declared previously", "");
+            return null;
+        }
+        m_functionTable.createFunction(identifier.m_value, null, null);
+        return m_functionTable.getFunction(identifier.m_value);
     }
 }

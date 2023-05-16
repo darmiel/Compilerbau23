@@ -2,24 +2,24 @@ package compiler.ast;
 
 import java.io.OutputStreamWriter;
 
-import compiler.Symbol;
+import compiler.FunctionInfo;
 
 public class ASTFunctionStmtNode extends ASTStmtNode {
 
-    private final Symbol _functionName;
+    private final FunctionInfo _functionInfo;
     
     private final ASTParameterListNode _parameters;
     private final ASTStmtNode _body;
     
-    public ASTFunctionStmtNode(Symbol functionName, ASTParameterListNode parameters, ASTStmtNode body) {
-        this._functionName = functionName;
+    public ASTFunctionStmtNode(FunctionInfo functionInfo, ASTParameterListNode parameters, ASTStmtNode body) {
+        this._functionInfo = functionInfo;
         this._parameters = parameters;
         this._body = body;
     }
 
     @Override
     public void print(OutputStreamWriter outStream, String indent) throws Exception {
-        outStream.write(indent + "FUNCTION " + _functionName.m_name + "\n");
+        outStream.write(indent + "FUNCTION " + _functionInfo.m_name + "\n");
         indent += "    ";
         _parameters.print(outStream, indent);
         _body.print(outStream, indent);
@@ -30,5 +30,4 @@ public class ASTFunctionStmtNode extends ASTStmtNode {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'execute'");
     }
-    
 }
