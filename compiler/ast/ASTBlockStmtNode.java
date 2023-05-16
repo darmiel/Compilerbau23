@@ -1,39 +1,39 @@
 package compiler.ast;
 
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ASTBlockStmtNode extends ASTStmtNode {
+    private ASTStmtNode m_stmtList;
 
-    public List<ASTStmtNode> m_statements;
-
-    public ASTBlockStmtNode() {
-        m_statements = new ArrayList<>();
-    }
-
-    public void addStatement(ASTStmtNode stmtNode) {
-        m_statements.add(stmtNode);
+    public ASTBlockStmtNode(ASTStmtNode stmtList) {
+        m_stmtList = stmtList;
     }
 
     @Override
     public void print(OutputStreamWriter outStream, String indent) throws Exception {
-        for (int i = 0; i != m_statements.size(); i++) {
-            m_statements.get(i).print(outStream, indent);
-        }
+        outStream.write(indent + "ANONYMOUS BLOCK\n");
     }
 
     @Override
     public void execute() {
-        for (int i = 0; i != m_statements.size(); i++) {
-            m_statements.get(i).execute();
-        }
+        // TODO Auto-generated method stub
+        
     }
 
     @Override
     public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
-        for (int i = 0; i != m_statements.size(); i++) {
-            m_statements.get(i).codegen(env);
-        }
+        // we are in entry block
+        compiler.InstrBlock block = env.createBlock("anonymousBlock");
+        compiler.InstrBlock blockExit = env.createBlock("anonymousBlockExit");
+        compiler.InstrIntf jumpBlock = new compiler.instr.InstrJump(block);
+        env.addInstr(jumpBlock);
+        env.setCurrentBlock(block);
+        m_stmtList.codegen(env);
+        compiler.InstrIntf jumpBlockExit = new compiler.instr.InstrJump(blockExit);
+        env.addInstr(jumpBlockExit);
+        env.setCurrentBlock(blockExit);
         return null;
-    }}
+    }
+
+    
+}

@@ -229,7 +229,7 @@ public class Parser {
         // stmtlist: stmt stmtlist // SELECT = {IDENTIFIER, DECLARE, PRINT}
         // stmtlist: eps // SELECT = FOLLOW(stmtlist) = {EOF, RBRACE}
         // stmtlist: (stmt)* // TERMINATE on EOF, RBRACE
-        ASTBlockStmtNode stmtList = new ASTBlockStmtNode();
+        ASTStmtListNode stmtList = new ASTStmtListNode();
         while (
             m_lexer.lookAhead().m_type != TokenIntf.Type.EOF &&
             m_lexer.lookAhead().m_type != TokenIntf.Type.RBRACE
@@ -246,7 +246,7 @@ public class Parser {
       m_lexer.expect(TokenIntf.Type.LBRACE);
       ASTStmtNode stmtListNode = getStmtList();
       m_lexer.expect(TokenIntf.Type.RBRACE);
-      return stmtListNode;
+      return new ASTBlockStmtNode(stmtListNode);
     }
 
 }
