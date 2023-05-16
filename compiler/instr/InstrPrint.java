@@ -13,7 +13,12 @@ public class InstrPrint extends compiler.InstrIntf {
     
     @Override
     public void execute(ExecutionEnvIntf env) {
-        System.out.println(m_expr.getValue());        
+        try {
+            env.getOutputStream().write(Integer.toString(m_expr.getValue()));
+            env.getOutputStream().write("\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

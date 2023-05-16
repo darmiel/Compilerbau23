@@ -180,7 +180,6 @@ public class Parser {
 
         m_lexer.expect(TokenIntf.Type.ASSIGN);
         ASTExprNode expression = getQuestionMarkExpr();
-        m_lexer.expect(TokenIntf.Type.SEMICOLON);
         return new ASTAssignStmt(symbol, expression);
     }
 
@@ -194,14 +193,12 @@ public class Parser {
             m_symbolTable.createSymbol(identifier.m_value);
         }
         m_lexer.advance();
-        m_lexer.expect(TokenIntf.Type.SEMICOLON);
         return new ASTDeclareStmt(identifier);
     }
 
     ASTStmtNode getPrintStmt() throws Exception{
         m_lexer.expect(TokenIntf.Type.PRINT);
         ASTExprNode exprNode = getQuestionMarkExpr();
-        m_lexer.expect(TokenIntf.Type.SEMICOLON);
         return new ASTPrintStmtNode(exprNode);
         
     }
@@ -236,6 +233,7 @@ public class Parser {
         ) {
             ASTStmtNode currentStmt = getStmt();
             stmtList.addStatement(currentStmt);
+            m_lexer.expect(TokenIntf.Type.SEMICOLON);
         }
         return stmtList;
     }

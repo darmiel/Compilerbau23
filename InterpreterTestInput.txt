@@ -1,7 +1,14 @@
+$IN
 DECLARE a;
 DECLARE flag;
 flag = 1;
 {
   a = 5+2;
-};
+}
 PRINT flag ? 6*3 - a : 15;
+$OUT
+11
+$IN
+PRINT 15;
+$OUT
+15
