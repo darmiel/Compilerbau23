@@ -24,6 +24,6 @@ public class InstrAssignStmt extends InstrIntf {
 
     @Override
     public void trace(OutputStreamWriter os) throws Exception {
-        os.write(m_var.toString() + '=' + m_expression.toString() + '\n');
+        os.write("ASSIGN " + m_var.m_name + "\n");        
     }
 }

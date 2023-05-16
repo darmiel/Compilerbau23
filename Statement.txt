@@ -1,2 +1,3 @@
-PRINT 5+2;
-PRINT 6*3 - 2;
+DECLARE a;
+a = 5+2;
+PRINT 6*3 - a;

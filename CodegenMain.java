@@ -4,7 +4,7 @@ public class CodegenMain {
         String program = compiler.InputReader.fileToString(args[0]);
         compiler.CompileEnv env = new compiler.CompileEnv(program, true);
         env.compile();
-        env.dump(System.out);
+        //env.dump(System.out);
         env.execute(System.out);
     }
 }
