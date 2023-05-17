@@ -254,6 +254,39 @@ public class Parser {
       return new ASTBlockStmtNode(stmtListNode);
     }
 
+    ASTStmtNode getFunctionCallStmt() throws Exception {
+        // functioncallstmt: functioncallexpr
+        ASTExprNode expr = getFunctionCallExpr();
+        return new ASTFunctionCallStmtNode(expr);
+    }
+
+    ASTExprNode getFunctionCallExpr() throws Exception {
+        // functioncallExpr: CALL IDENTIFIER LPAREN argumentList RPAREN
+        m_lexer.expect(Type.CALL);
+        Token functionIdentifier = m_lexer.lookAhead();
+        m_lexer.expect(Type.IDENT);
+        m_lexer.expect(Type.LPAREN);
+        ASTArgumentListNode arguments = getArgumentList();
+        m_lexer.expect(Type.RPAREN);
+
+        return new ASTFunctionCallExprNode(functionIdentifier.m_value, arguments);
+    }
+
+    ASTArgumentListNode getArgumentList() throws Exception {
+        // argumentList: expr (COMMA expr)*  WHILE lookahead = { COMMA }
+        // argumentList: eps    SELECT = { RPAREN }
+        ASTArgumentListNode arguments = new ASTArgumentListNode(); 
+        if(m_lexer.lookAhead().m_type == Type.RPAREN) {
+            return arguments;
+        }
+        arguments.addArgument(getQuestionMarkExpr());
+        while(m_lexer.lookAhead().m_type == Type.COMMA) {
+            m_lexer.expect(Type.COMMA);
+            arguments.addArgument(getQuestionMarkExpr());
+        }
+        return arguments;
+    }
+
     ASTStmtNode getFunctionBodyStmt() throws Exception {
         // functionBody: LBRACE stmtlist RBRACE
         m_lexer.expect(TokenIntf.Type.LBRACE);
@@ -280,7 +313,7 @@ public class Parser {
 
     ASTParameterListNode getParameterList() throws Exception {
         // parameterList: IDENTIFIER (COMMA IDENTIFIER)*	SELECT(parameterList) = { IDENTIFIER }
-        // parameterList: eps		TERMINATE ON FOLLOW(parameterList) = { RPAREN }
+        // parameterList: eps		SELECT(parameterList2) = FOLLOW(parameterList) = { RPAREN }
         ASTParameterListNode parameterList = new ASTParameterListNode();
         if(m_lexer.lookAhead().m_type == Type.RPAREN) {
             return parameterList;
