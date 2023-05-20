@@ -247,4 +247,29 @@ public class Parser {
       return new ASTBlockStmtNode(stmtListNode);
     }
 
+    ASTStmtNode getIfStmt() throws Exception {
+        // ifStmt := IF LBRACE stmt RBRACE blockStmt // SELECT(ifStmt) = { IF }
+        m_lexer.expect(Type.IF);
+        m_lexer.expect(Type.LPAREN);
+        ASTExprNode condition = getCompareExpr(); // unsure if all necessary Expressions match - maybe the wrong one
+        m_lexer.expect(Type.RPAREN);
+        ASTStmtNode codeTrue = getBlockStmt();
+
+        if (m_lexer.lookAhead().m_type == Type.ELSE) {
+            m_lexer.expect(Type.ELSE); // UNSURE if LookAhead already consumes
+            // ifStmt := IF LBRACE stmt RBRACE blockStmt ELSE blockStmt // SELECT(blockStmt) = { LBRACE }
+            if (m_lexer.lookAhead().m_type == Type.LBRACE) {
+                ASTStmtNode codeFalse = getBlockStmt();
+                return new ASTIfStmt(condition, codeTrue, codeFalse);
+            }
+            // ifStmt := IF LBRACE stmt RBRACE blockStmt ELSE ifStmt // SELECT(ifStmt) = { IF }
+            if (m_lexer.lookAhead().m_type == Type.IF) {
+                ASTStmtNode elseIf = getIfStmt();
+                return new ASTIfStmt(condition, codeTrue, elseIf);
+            }
+        }
+
+        return new ASTIfStmt(condition, codeTrue, null);
+    }
+
 }
