@@ -31,7 +31,7 @@ public class ASTStmtListNode extends ASTStmtNode {
     }
 
     @Override
-    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) throws Exception {
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
         for (int i = 0; i != m_statements.size(); i++) {
             m_statements.get(i).codegen(env);
         }

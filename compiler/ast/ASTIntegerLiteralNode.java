@@ -24,7 +24,7 @@ public class ASTIntegerLiteralNode extends ASTExprNode {
 
 
     @Override
-    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) throws Exception {
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
         // create instruction object
         // pass instruction objects of childs
         // as input arguments

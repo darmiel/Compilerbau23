@@ -40,7 +40,7 @@ public class ASTArgumentListNode extends ASTStmtNode {
     }
 
     @Override
-    public InstrIntf codegen(CompileEnvIntf env) throws Exception {
+    public InstrIntf codegen(CompileEnvIntf env) {
         InstrArgumentList args = new InstrArgumentList();
         for(int i = 0; i < _arguments.size(); ++i) {
             args.addArgument(_arguments.get(i).codegen(env));

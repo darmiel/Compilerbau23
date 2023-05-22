@@ -23,7 +23,7 @@ public class ASTBlockStmtNode extends ASTStmtNode {
     }
 
     @Override
-    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) throws Exception {
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
         // we are in entry block
         compiler.InstrBlock block = env.createBlock("anonymousBlock");
         compiler.InstrBlock blockExit = env.createBlock("anonymousBlockExit");

@@ -25,7 +25,7 @@ public class ASTFunctionBodyStmtNode extends ASTStmtNode {
     }
  
     @Override
-    public InstrIntf codegen(CompileEnvIntf env) throws Exception {
+    public InstrIntf codegen(CompileEnvIntf env) {
         return m_stmtList.codegen(env);
     }
 }

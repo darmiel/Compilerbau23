@@ -29,7 +29,7 @@ public class ASTParantheseExprNode extends ASTExprNode{
     }
 
     @Override
-    public InstrIntf codegen(CompileEnvIntf env) throws Exception {
+    public InstrIntf codegen(CompileEnvIntf env) {
         compiler.InstrIntf innerInstruction = inner.codegen(env);
         compiler.InstrIntf parantheseInstr = new compiler.instr.InstrParanthese(innerInstruction);
         env.addInstr(parantheseInstr);

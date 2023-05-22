@@ -27,7 +27,7 @@ public class ASTReturnStmt extends ASTStmtNode {
     }
 
     @Override
-    public InstrIntf codegen(CompileEnvIntf env) throws Exception {
+    public InstrIntf codegen(CompileEnvIntf env) {
         InstrIntf expr = _expression.codegen(env);
         InstrIntf returnStmt = new InstrReturnStmt(expr);
         env.addInstr(returnStmt);

@@ -40,7 +40,7 @@ public class ASTFunctionStmtNode extends ASTStmtNode {
     }
 
     @Override
-    public InstrIntf codegen(CompileEnvIntf env) throws Exception {
+    public InstrIntf codegen(CompileEnvIntf env) {
         InstrBlock currentBlock = env.getCurrentBlock();
         InstrBlock funcBlock = env.createBlock("func-" + _functionCounter);
         _functionCounter++;

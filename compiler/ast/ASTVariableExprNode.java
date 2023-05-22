@@ -29,7 +29,7 @@ public class ASTVariableExprNode extends ASTExprNode {
     }
 
     @Override
-    public InstrIntf codegen(final CompileEnvIntf environment) throws Exception {
+    public InstrIntf codegen(final CompileEnvIntf environment) {
         final InstrIntf instr = new InstrVariable(this.symbol.m_name);
         environment.addInstr(instr);
         return instr;
