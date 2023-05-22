@@ -216,6 +216,8 @@ public class Parser {
         //    stmt: blockStmt // SELECT = {LBRACE}
         } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.LBRACE) {
             return getBlockStmt();
+        } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.FOR) {
+            return getFor();
         } else {
             m_lexer.throwCompilerException("Unexpected Statement", "");
         }
