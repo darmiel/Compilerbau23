@@ -3,5 +3,5 @@ FUNCTION asd(a,b,c) {
 };
 
 DECLARE res;
-res = CALL asd(2+10, 5, 5, 1);
+res = CALL asd(2+10, 5, 5);
 PRINT res;
