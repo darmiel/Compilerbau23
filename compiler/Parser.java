@@ -221,10 +221,15 @@ public class Parser {
         //    stmt: blockStmt // SELECT = {LBRACE}
         } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.LBRACE) {
             return getBlockStmt();
+        //   stmt: returnStmt // SELECT = {RETURN}
         } else if(m_lexer.lookAhead().m_type == Type.RETURN) {
             return getReturnStmt();
+        //   stmt: functionStmt // SELECT = {FUNCTION}
         } else if(m_lexer.lookAhead().m_type == Type.FUNCTION) {
             return getFunctionStmt();
+        //   stmt: functionCallStmt // SELECT = {CALL}
+        } else if(m_lexer.lookAhead().m_type == Type.CALL) {
+            return getFunctionCallStmt();
         } else {
             m_lexer.throwCompilerException("Unexpected Statement", "");
         }

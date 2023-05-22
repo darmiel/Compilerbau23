@@ -7,6 +7,8 @@ import compiler.CompileEnvIntf;
 import compiler.FunctionInfo;
 import compiler.InstrBlock;
 import compiler.InstrIntf;
+import compiler.instr.InstrIntegerLiteral;
+import compiler.instr.InstrReturnStmt;
 
 public class ASTFunctionStmtNode extends ASTStmtNode {
 
@@ -50,7 +52,8 @@ public class ASTFunctionStmtNode extends ASTStmtNode {
 
         env.setCurrentBlock(funcBlock);
         _body.codegen(env);
-        // TODO: evtl jump am ende der function wenn kein return da is
+        // RETURN 0 if there is no return before (make sure to jump back to the caller)
+        env.addInstr(new InstrReturnStmt(new InstrIntegerLiteral(0)));
         env.setCurrentBlock(currentBlock);
         return null;
     }
