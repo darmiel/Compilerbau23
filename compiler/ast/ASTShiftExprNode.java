@@ -36,7 +36,7 @@ public class ASTShiftExprNode extends ASTExprNode {
     }
 
     @Override
-    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) throws Exception {
         compiler.InstrIntf lhs = m_lhs.codegen(env);
         compiler.InstrIntf rhs = m_rhs.codegen(env);
         compiler.InstrIntf instr = new compiler.instr.InstrShiftOperation(m_token.m_type, lhs, rhs);

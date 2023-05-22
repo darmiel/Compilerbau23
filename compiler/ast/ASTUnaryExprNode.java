@@ -30,7 +30,7 @@ public class ASTUnaryExprNode extends ASTExprNode {
         return result;
     }
 
-    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) throws Exception {
         compiler.InstrIntf rhs = m_rhs.codegen(env);
         compiler.InstrIntf instr = new compiler.instr.InstrUnaryExpr(m_token.m_type, rhs);
         env.addInstr(instr);

@@ -29,7 +29,7 @@ public class ASTQuestionMarkNode extends ASTExprNode {
     }
 
     @Override
-    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) throws Exception {
         compiler.InstrIntf instrCond = this.cond.codegen(env);
         compiler.InstrIntf instrValue1 = this.value1.codegen(env);
         compiler.InstrIntf instrValue2 = this.value2.codegen(env);

@@ -25,7 +25,7 @@ public class ASTPrintStmtNode extends ASTStmtNode {
     }
 
 
-    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) throws Exception {
         compiler.InstrIntf instrExpr = expression.codegen(env);
         compiler.InstrIntf instrPrint = new compiler.instr.InstrPrint(instrExpr);
         env.addInstr(instrPrint);

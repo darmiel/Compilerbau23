@@ -34,10 +34,12 @@ public class ASTFunctionCallExprNode extends ASTExprNode {
     }
 
     @Override
-    public InstrIntf codegen(CompileEnvIntf env) {
+    public InstrIntf codegen(CompileEnvIntf env) throws Exception {
         FunctionInfo func = env.getFunctionTable().getFunction(_functionName);
         // parameter amount must match
-        assert (_arguments.getArguments().size() != func.varNames.size());
+        if (_arguments.getArguments().size() != func.varNames.size()) {
+            throw new Exception("Function " + _functionName + " expectes " + func.varNames.size() + " arguments. Got " + _arguments.getArguments().size(), null);
+        }
 
         InstrIntf argumentsInstr = _arguments.codegen(env);
         env.addInstr(argumentsInstr);  

@@ -27,7 +27,7 @@ public class ASTAssignStmt extends ASTStmtNode {
         this.symbol.m_number = this.expression.eval();
     }
 
-    public InstrIntf codegen(CompileEnvIntf env) {
+    public InstrIntf codegen(CompileEnvIntf env) throws Exception {
         InstrIntf expInstr = expression.codegen(env);
         InstrIntf instr = new compiler.instr.InstrAssignStmt(symbol, expInstr);
         env.addInstr(instr);
