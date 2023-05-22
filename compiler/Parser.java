@@ -275,8 +275,18 @@ public class Parser {
         m_lexer.expect(Type.LPAREN);
         ASTArgumentListNode arguments = getArgumentList();
         m_lexer.expect(Type.RPAREN);
+        
+        FunctionInfo funcInfo = m_functionTable.getFunction(functionIdentifier.m_value);
+        if(funcInfo == null) {
+            m_lexer.throwCompilerException("Function " + functionIdentifier.m_value + " is not defined!", null);
+        }
+        if(funcInfo.varNames.size() != arguments.getArguments().size()) {
+            m_lexer.throwCompilerException("Invalid number of Arguments",
+                 "Function " + funcInfo.m_name + " expects " + funcInfo.varNames.size() + " arguments! Got " + arguments.getArguments().size()
+            );
+        }
 
-        return new ASTFunctionCallExprNode(functionIdentifier.m_value, arguments);
+        return new ASTFunctionCallExprNode(funcInfo, arguments);
     }
 
     ASTArgumentListNode getArgumentList() throws Exception {
@@ -314,6 +324,8 @@ public class Parser {
         ASTParameterListNode parameters = getParameterList();
         m_lexer.expect(Type.RPAREN);
         ASTStmtNode functionBody = getFunctionBodyStmt();
+
+        functionInfo.varNames = parameters.getParametersAsStringList();
 
         return new ASTFunctionStmtNode(functionInfo, parameters, functionBody);
     }

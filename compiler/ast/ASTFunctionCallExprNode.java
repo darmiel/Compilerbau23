@@ -3,26 +3,24 @@ package compiler.ast;
 import java.io.OutputStreamWriter;
 
 import compiler.CompileEnvIntf;
-import compiler.CompilerException;
 import compiler.FunctionInfo;
 import compiler.InstrIntf;
 import compiler.instr.InstrCallFunction;
-import compiler.instr.InstrJump;
 import compiler.instr.InstrPop;
 
 public class ASTFunctionCallExprNode extends ASTExprNode {
 
-    private final String _functionName;
+    private final FunctionInfo _functionInfo;
     private final ASTArgumentListNode _arguments;
 
-    public ASTFunctionCallExprNode(String functionName, ASTArgumentListNode args) {
-        _functionName = functionName;
+    public ASTFunctionCallExprNode(FunctionInfo functionInfo, ASTArgumentListNode args) {
+        _functionInfo = functionInfo;
         _arguments = args;
     }
 
     @Override
     public void print(OutputStreamWriter outStream, String indent) throws Exception {
-        outStream.write(indent+"CALL " + _functionName + "\n");
+        outStream.write(indent+"CALL " + _functionInfo.m_name + "\n");
         indent += "    ";
         _arguments.print(outStream, indent);
     }
@@ -35,15 +33,9 @@ public class ASTFunctionCallExprNode extends ASTExprNode {
 
     @Override
     public InstrIntf codegen(CompileEnvIntf env) {
-        FunctionInfo func = env.getFunctionTable().getFunction(_functionName);
-        // parameter amount must match
-        if (_arguments.getArguments().size() != func.varNames.size()) {
-            throw new RuntimeException("Function " + _functionName + " expectes " + func.varNames.size() + " arguments. Got " + _arguments.getArguments().size(), null);
-        }
-
         InstrIntf argumentsInstr = _arguments.codegen(env);
         env.addInstr(argumentsInstr);  
-        InstrIntf callInstr = new InstrCallFunction(func);
+        InstrIntf callInstr = new InstrCallFunction(_functionInfo);
         env.addInstr(callInstr);
         InstrIntf popInstr = new InstrPop();
         env.addInstr(popInstr);

@@ -3,6 +3,7 @@ package compiler.ast;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import compiler.Symbol;
 
@@ -20,6 +21,13 @@ public class ASTParameterListNode extends ASTStmtNode {
 
     public List<Symbol> getParameters() {
         return _parameters;
+    }
+
+    public List<String> getParametersAsStringList() {
+        return _parameters
+            .stream()
+            .map(e -> e.m_name)
+            .collect(Collectors.toList());
     }
 
     @Override
