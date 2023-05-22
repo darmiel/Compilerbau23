@@ -69,9 +69,9 @@ public class CompileEnv implements CompileEnvIntf {
 	    os.flush();
     }
 
-    public void execute(OutputStream outStream) throws Exception {
-        //ExecutionEnv env = new ExecutionEnv(m_functionTable, m_symbolTable, outStream, m_trace);
-        //env.execute(m_entry.getIterator());
+    public void execute(OutputStreamWriter outStream) throws Exception {
+        ExecutionEnv env = new ExecutionEnv(m_functionTable, m_symbolTable, outStream, m_trace);
+        env.execute(m_entry.getIterator());
     }
 
     public void addInstr(InstrIntf instr) {
@@ -86,7 +86,8 @@ public class CompileEnv implements CompileEnvIntf {
     }
 
     public InstrBlock createBlock(String name) {
-        InstrBlock newBlock = new InstrBlock(name);
+        InstrBlock newBlock = new InstrBlock(name + "_" + Integer.toString(m_nextBlockId));
+        m_nextBlockId++;
         m_blockList.add(newBlock);
         return newBlock;
     }

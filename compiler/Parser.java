@@ -180,7 +180,6 @@ public class Parser {
 
         m_lexer.expect(TokenIntf.Type.ASSIGN);
         ASTExprNode expression = getQuestionMarkExpr();
-        m_lexer.expect(TokenIntf.Type.SEMICOLON);
         return new ASTAssignStmt(symbol, expression);
     }
 
@@ -194,14 +193,12 @@ public class Parser {
             m_symbolTable.createSymbol(identifier.m_value);
         }
         m_lexer.advance();
-        m_lexer.expect(TokenIntf.Type.SEMICOLON);
         return new ASTDeclareStmt(identifier);
     }
 
     ASTStmtNode getPrintStmt() throws Exception{
         m_lexer.expect(TokenIntf.Type.PRINT);
         ASTExprNode exprNode = getQuestionMarkExpr();
-        m_lexer.expect(TokenIntf.Type.SEMICOLON);
         return new ASTPrintStmtNode(exprNode);
         
     }
@@ -216,6 +213,9 @@ public class Parser {
         //    stmt: printStmt // SELECT = {PRINT}
         } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.PRINT) {
             return getPrintStmt();
+        //    stmt: blockStmt // SELECT = {LBRACE}
+        } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.LBRACE) {
+            return getBlockStmt();
         } else {
             m_lexer.throwCompilerException("Unexpected Statement", "");
         }
@@ -224,13 +224,27 @@ public class Parser {
 
     ASTStmtNode getStmtList() throws Exception {
         // stmtlist: stmt stmtlist // SELECT = {IDENTIFIER, DECLARE, PRINT}
-        // stmtlist: eps // SELECT = {EOF}
-        // stmtlist: (stmt)* // TERMINATE on EOF
-        ASTBlockStmtNode stmtList = new ASTBlockStmtNode();
-        while (m_lexer.lookAhead().m_type != TokenIntf.Type.EOF) {
+        // stmtlist: eps // SELECT = FOLLOW(stmtlist) = {EOF, RBRACE}
+        // stmtlist: (stmt)* // TERMINATE on EOF, RBRACE
+        ASTStmtListNode stmtList = new ASTStmtListNode();
+        while (
+            m_lexer.lookAhead().m_type != TokenIntf.Type.EOF &&
+            m_lexer.lookAhead().m_type != TokenIntf.Type.RBRACE
+        ) {
             ASTStmtNode currentStmt = getStmt();
             stmtList.addStatement(currentStmt);
+            m_lexer.expect(TokenIntf.Type.SEMICOLON);
         }
         return stmtList;
     }
+
+    ASTStmtNode getBlockStmt() throws Exception {
+      // blockStmt: LBRACE stmtlist RBRACE
+      // SELECT(blockStmt) = FIRST(blockStmt) = { LBRACE }
+      m_lexer.expect(TokenIntf.Type.LBRACE);
+      ASTStmtNode stmtListNode = getStmtList();
+      m_lexer.expect(TokenIntf.Type.RBRACE);
+      return new ASTBlockStmtNode(stmtListNode);
+    }
+
 }

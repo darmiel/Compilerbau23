@@ -10,6 +10,7 @@ public interface CompileEnvIntf {
 	 *  create new instruction block
 	 */
 	public InstrBlock createBlock();
+	public InstrBlock createBlock(String name);
 	
 	/**
 	 *  set current instruction block
