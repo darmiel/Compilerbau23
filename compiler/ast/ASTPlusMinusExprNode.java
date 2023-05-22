@@ -1,5 +1,8 @@
 package compiler.ast;
 
+import compiler.info.ConstInfo;
+import compiler.instr.InstrIntegerLiteral;
+
 import java.io.OutputStreamWriter;
 
 public class ASTPlusMinusExprNode extends ASTExprNode {
@@ -35,6 +38,12 @@ public class ASTPlusMinusExprNode extends ASTExprNode {
     }
 
     public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
+        final ConstInfo constInfo = this.constFold();
+        if (constInfo.isConst()) {
+            final InstrIntegerLiteral res = new InstrIntegerLiteral(constInfo.getValue());
+            env.addInstr(res);
+            return res;
+        }
         compiler.InstrIntf lhs = m_lhs.codegen(env);
         compiler.InstrIntf rhs = m_rhs.codegen(env);
         compiler.InstrIntf instr = new compiler.instr.InstrPlusMinus(m_token.m_type, lhs, rhs);
@@ -42,4 +51,14 @@ public class ASTPlusMinusExprNode extends ASTExprNode {
         return instr;
     }
 
+    @Override
+    public ConstInfo constFold() {
+        final ConstInfo lhsConstInfo = this.m_lhs.constFold();
+        final ConstInfo rhsConstInfo = this.m_rhs.constFold();
+        if (lhsConstInfo.isConst() && rhsConstInfo.isConst()) {
+            final int value = this.eval();
+            return new ConstInfo(true, value);
+        }
+        return new ConstInfo(false, 0);
+    }
 }
