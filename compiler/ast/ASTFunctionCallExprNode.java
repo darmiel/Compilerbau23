@@ -8,6 +8,7 @@ import compiler.FunctionInfo;
 import compiler.InstrIntf;
 import compiler.instr.InstrCallFunction;
 import compiler.instr.InstrJump;
+import compiler.instr.InstrPop;
 
 public class ASTFunctionCallExprNode extends ASTExprNode {
 
@@ -35,14 +36,16 @@ public class ASTFunctionCallExprNode extends ASTExprNode {
     @Override
     public InstrIntf codegen(CompileEnvIntf env) {
         FunctionInfo func = env.getFunctionTable().getFunction(_functionName);
-        if(_arguments.getArguments().size() != func.varNames.size()) {
-            throw new CompilerException("Invalid amount of arguments for function " + func.m_name + ". Given amount: " + _arguments.getArguments().size(), 0, _functionName, "Function " + func.m_name + "only accepts " + func.varNames.size() + " arguments.");
-        }
+        // parameter amount must match
+        assert (_arguments.getArguments().size() != func.varNames.size());
+
         InstrIntf argumentsInstr = _arguments.codegen(env);
         env.addInstr(argumentsInstr);  
         InstrIntf callInstr = new InstrCallFunction(func);
         env.addInstr(callInstr);
-        return callInstr;  
+        InstrIntf popInstr = new InstrPop();
+        env.addInstr(popInstr);
+        return popInstr;  
     }
     
 }

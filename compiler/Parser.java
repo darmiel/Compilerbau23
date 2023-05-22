@@ -42,6 +42,8 @@ public class Parser {
         } else if (this.m_lexer.lookAhead().m_type == TokenIntf.Type.IDENT) {
             node = this.getVariableExpr();
             this.m_lexer.advance();
+        }else if(this.m_lexer.lookAhead().m_type == Type.CALL) {
+            node = this.getFunctionCallExpr();
         }else if(m_lexer.lookAhead().m_type == TokenIntf.Type.LPAREN) {
             m_lexer.expect(TokenIntf.Type.LPAREN);
             ASTExprNode innerNode = getQuestionMarkExpr();

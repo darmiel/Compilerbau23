@@ -27,7 +27,7 @@ public class CompileEnv implements CompileEnvIntf {
         m_functionTable = new FunctionTable();
         m_lexer = new Lexer();
         m_lexer.init(input);
-        m_parser = new Parser(m_lexer, this.m_symbolTable);
+        m_parser = new Parser(m_lexer, this.m_symbolTable, m_functionTable);
         m_blockList = new ArrayList<InstrBlock>();
         loopStack = new Stack<InstrBlock>();
     }

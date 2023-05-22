@@ -29,7 +29,6 @@ public class InstrCallFunction extends InstrIntf {
 
     @Override
     public void trace(OutputStreamWriter os) throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'trace'");
+        os.write("CALL " + _function.m_name + "\n");
     }
 }
