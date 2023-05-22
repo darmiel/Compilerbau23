@@ -2,6 +2,10 @@ package compiler.ast;
 
 import java.io.OutputStreamWriter;
 
+import compiler.CompileEnvIntf;
+import compiler.InstrIntf;
+import compiler.instr.InstrReturnStmt;
+
 public class ASTReturnStmt extends ASTStmtNode {
 
     private final ASTExprNode _expression;
@@ -20,7 +24,14 @@ public class ASTReturnStmt extends ASTStmtNode {
     @Override
     public void execute() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'execute'");
+    }
+
+    @Override
+    public InstrIntf codegen(CompileEnvIntf env) {
+        InstrIntf expr = _expression.codegen(env);
+        InstrIntf returnStmt = new InstrReturnStmt(expr);
+        env.addInstr(returnStmt);
+        return returnStmt;
     }
     
 }

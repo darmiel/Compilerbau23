@@ -2,6 +2,9 @@ package compiler.ast;
 
 import java.io.OutputStreamWriter;
 
+import compiler.CompileEnvIntf;
+import compiler.InstrIntf;
+
 public class ASTFunctionCallStmtNode extends ASTStmtNode {
 
     private final ASTExprNode _expression;
@@ -21,4 +24,9 @@ public class ASTFunctionCallStmtNode extends ASTStmtNode {
         throw new UnsupportedOperationException("Unimplemented method 'execute'");
     }
     
+    @Override
+    public InstrIntf codegen(CompileEnvIntf env) {
+        InstrIntf funcCall = _expression.codegen(env);
+        return funcCall;
+    }
 }

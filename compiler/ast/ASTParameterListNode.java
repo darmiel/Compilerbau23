@@ -18,6 +18,10 @@ public class ASTParameterListNode extends ASTStmtNode {
         _parameters.add(s);
     }
 
+    public List<Symbol> getParameters() {
+        return _parameters;
+    }
+
     @Override
     public void print(OutputStreamWriter outStream, String indent) throws Exception {
         outStream.write(indent + "PARAMS ");
