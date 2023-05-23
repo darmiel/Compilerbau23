@@ -235,7 +235,9 @@ public class Parser {
         ) {
             ASTStmtNode currentStmt = getStmt();
             stmtList.addStatement(currentStmt);
-            m_lexer.expect(TokenIntf.Type.SEMICOLON);
+            
+            // TODO: temporary solution. all control structures do not expect a SEMICOLON at the end.
+            if (!(currentStmt instanceof ASTForStmtNode)) m_lexer.expect(TokenIntf.Type.SEMICOLON);
         }
         return stmtList;
     }
@@ -247,6 +249,22 @@ public class Parser {
       ASTStmtNode stmtListNode = getStmtList();
       m_lexer.expect(TokenIntf.Type.RBRACE);
       return new ASTBlockStmtNode(stmtListNode);
+    }
+
+    ASTStmtNode getFor() throws Exception {
+        // for_stmt: FOR LPAREN stmt SEMICOLON expr SEMICOLON stmt RPAREN LBRACE block_stmt RBRACE
+        m_lexer.expect(Type.FOR);
+        m_lexer.expect(Type.LPAREN);
+        ASTStmtNode iteratorStmt = getStmt();
+        m_lexer.expect(Type.SEMICOLON);
+        ASTExprNode conditionExpr = getCompareExpr();
+        m_lexer.expect(Type.SEMICOLON);
+        ASTStmtNode iteratorOperationStmt = getStmt();
+        m_lexer.expect(Type.RPAREN);
+        m_lexer.expect(Type.LBRACE);
+        ASTStmtNode body = getStmtList();
+        m_lexer.expect(Type.RBRACE);
+        return new ASTForStmtNode(iteratorStmt, conditionExpr, iteratorOperationStmt, body);
     }
 
 }
