@@ -1,11 +1,8 @@
-$IN
 DECLARE index;
 DECLARE sum;
-index = 64;
+index = 0;
 sum = 0;
-FOR(index = index * 2; index; index = index / 2) {
+FOR(index = 10; index; index = index - 1) {
   sum = sum + index;
 }
 PRINT sum;
-$OUT
-255
