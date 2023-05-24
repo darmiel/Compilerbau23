@@ -16,6 +16,7 @@ public class InstrPrint extends compiler.InstrIntf {
         try {
             env.getOutputStream().write(Integer.toString(m_expr.getValue()));
             env.getOutputStream().write("\n");
+            env.getOutputStream().flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
