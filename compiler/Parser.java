@@ -230,7 +230,13 @@ public class Parser {
         //   stmt: functionCallStmt // SELECT = {CALL}
         } else if(m_lexer.lookAhead().m_type == Type.CALL) {
             return getFunctionCallStmt();
-        } else {
+            //   stmt: functionCallStmt // SELECT = {WHILE}
+        } else if (m_lexer.lookAhead().m_type == Token.Type.WHILE) {
+			return getWhileStatement();
+            //   stmt: functionCallStmt // SELECT = {DOWHILE}
+		} else if (m_lexer.lookAhead().m_type == Token.Type.DO) {
+			return getDoWhileStatement();
+        }else {
             m_lexer.throwCompilerException("Unexpected Statement", "");
         }
         return null;
@@ -371,5 +377,25 @@ public class Parser {
         }
         m_functionTable.createFunction(identifier.m_value, null, null);
         return m_functionTable.getFunction(identifier.m_value);
+    }
+
+ 	ASTStmtNode getWhileStatement() throws Exception {
+        m_lexer.expect(TokenIntf.Type.WHILE);
+        m_lexer.expect(TokenIntf.Type.LPAREN);
+        ASTExprNode exprNode = getQuestionMarkExpr();
+        m_lexer.expect(TokenIntf.Type.RPAREN);
+        ASTStmtNode blockstmt = getBlockStmt();
+        return new ASTWhileStmtNode(exprNode, blockstmt);
+    }
+
+    ASTStmtNode getDoWhileStatement() throws Exception {
+        m_lexer.expect(TokenIntf.Type.DO);
+        ASTStmtNode blockstmt = getBlockStmt();
+        m_lexer.expect(TokenIntf.Type.WHILE);
+        m_lexer.expect(TokenIntf.Type.LPAREN);
+        ASTExprNode exprNode = getQuestionMarkExpr();
+        m_lexer.expect(TokenIntf.Type.RPAREN);
+        m_lexer.expect(TokenIntf.Type.SEMICOLON);
+        return new ASTDoWhileStmtNode(exprNode, blockstmt);
     }
 }
