@@ -1,7 +1,10 @@
 package compiler.ast;
 
 import compiler.CompileEnvIntf;
+import compiler.InstrBlock;
 import compiler.InstrIntf;
+import compiler.instr.InstrJump;
+import compiler.instr.InstrJumpCond;
 
 import java.io.OutputStreamWriter;
 
@@ -32,14 +35,36 @@ public class ASTForStmtNode extends ASTStmtNode {
 
     @Override
     public void execute() {
-        // for (iterator condition iteratorOperation) body
-        for (iterator.execute(); condition.eval() > 0; iteratorOperation.execute()) {
+        // for (iterator; condition; iteratorOperation) { body }
+        for (iterator.execute(); condition.eval() != 0; iteratorOperation.execute()) {
             body.execute();
         }
     }
 
     @Override
     public InstrIntf codegen(CompileEnvIntf env) {
-        return super.codegen(env);
+        InstrBlock forHead = env.createBlock("for_head");
+        InstrBlock forBody = env.createBlock("for_body");
+        InstrBlock forExit = env.createBlock("for_exit");
+        InstrIntf jumpForHead = new InstrJump(forHead);
+
+        iterator.codegen(env);
+        env.addInstr(jumpForHead);
+
+        // for_head:
+        env.setCurrentBlock(forHead);
+        InstrIntf cond = condition.codegen(env);
+        InstrIntf condJump = new InstrJumpCond(cond, forBody, forExit);
+        env.addInstr(condJump);
+
+        // for_body:
+        env.setCurrentBlock(forBody);
+        body.codegen(env);
+        iteratorOperation.codegen(env);
+        env.addInstr(jumpForHead);
+
+        // for_exit:
+        env.setCurrentBlock(forExit);
+        return null;
     }
 }
