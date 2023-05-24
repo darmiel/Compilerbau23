@@ -253,7 +253,9 @@ public class Parser {
         ) {
             ASTStmtNode currentStmt = getStmt();
             stmtList.addStatement(currentStmt);
-            m_lexer.expect(TokenIntf.Type.SEMICOLON);
+            if (currentStmt.semicolAfter()) {
+                m_lexer.expect(TokenIntf.Type.SEMICOLON);
+            }
         }
         return stmtList;
     }

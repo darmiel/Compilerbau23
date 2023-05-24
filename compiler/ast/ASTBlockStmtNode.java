@@ -37,5 +37,9 @@ public class ASTBlockStmtNode extends ASTStmtNode {
         return null;
     }
 
+    @Override
+    public boolean semicolAfter()  { return false; }
+
+
     
 }
