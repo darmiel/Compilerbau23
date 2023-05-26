@@ -1,7 +1,5 @@
-DECLARE a;
-DECLARE flag;
-flag = 1;
-{
-  a = 5+2;
+IF (1) {
+    PRINT 1;
+} ELSE {
+    PRINT 2;
 };
-PRINT flag ? 6*3 - a : 15;

@@ -216,6 +216,8 @@ public class Parser {
         //    stmt: blockStmt // SELECT = {LBRACE}
         } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.LBRACE) {
             return getBlockStmt();
+        } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.IF) {
+            return getIfStmt();
         } else {
             m_lexer.throwCompilerException("Unexpected Statement", "");
         }
@@ -251,12 +253,12 @@ public class Parser {
         // ifStmt := IF LBRACE stmt RBRACE blockStmt // SELECT(ifStmt) = { IF }
         m_lexer.expect(Type.IF);
         m_lexer.expect(Type.LPAREN);
-        ASTExprNode condition = getCompareExpr(); // unsure if all necessary Expressions match - maybe the wrong one
+        ASTExprNode condition = getQuestionMarkExpr();
         m_lexer.expect(Type.RPAREN);
         ASTStmtNode codeTrue = getBlockStmt();
 
         if (m_lexer.lookAhead().m_type == Type.ELSE) {
-            m_lexer.expect(Type.ELSE); // UNSURE if LookAhead already consumes
+            m_lexer.advance();
             // ifStmt := IF LBRACE stmt RBRACE blockStmt ELSE blockStmt // SELECT(blockStmt) = { LBRACE }
             if (m_lexer.lookAhead().m_type == Type.LBRACE) {
                 ASTStmtNode codeFalse = getBlockStmt();

@@ -8,6 +8,6 @@ public class CodegenMain {
         env.compile();
         env.dump(System.out);
         OutputStreamWriter outStream = new OutputStreamWriter(System.out);
-        env.execute(outStream);
+        // env.execute(outStream);
     }
 }
