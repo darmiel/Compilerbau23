@@ -77,6 +77,7 @@ public class Lexer implements LexerIntf, LexerParserIntf {
         addKeywordMachine("DO", compiler.TokenIntf.Type.DO);
         addKeywordMachine("FOR", compiler.TokenIntf.Type.FOR);
         addKeywordMachine("LOOP", compiler.TokenIntf.Type.LOOP);
+        addKeywordMachine("ENDLOOP", compiler.TokenIntf.Type.ENDLOOP);
         addKeywordMachine("BREAK", compiler.TokenIntf.Type.BREAK);
         addKeywordMachine("SWITCH", compiler.TokenIntf.Type.SWITCH);
         addKeywordMachine("CASE", compiler.TokenIntf.Type.CASE);

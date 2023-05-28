@@ -17,7 +17,7 @@ public class ASTAssignStmt extends ASTStmtNode {
 
     @Override
     public void print(OutputStreamWriter outStream, String indent) throws Exception {
-        outStream.write(indent + "Assign " + this.symbol.m_name + "\n");
+        outStream.write(indent + "ASSIGN " + this.symbol.m_name + "\n");
         indent += "    ";
         this.expression.print(outStream, indent);       
     }

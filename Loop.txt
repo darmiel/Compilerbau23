@@ -1,0 +1,13 @@
+DECLARE index;
+DECLARE sum;
+index = 0;
+sum = 0;
+LOOP {
+  index = index + 1;
+  sum = sum + index;
+  IF (index > 9) {
+      BREAK;
+  }
+} ENDLOOP
+PRINT index;
+PRINT sum;

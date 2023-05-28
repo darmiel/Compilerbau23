@@ -1,5 +1,7 @@
 package compiler.ast;
 
+import compiler.exceptions.BreakException;
+
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +26,12 @@ public class ASTStmtListNode extends ASTStmtNode {
     }
 
     @Override
-    public void execute() {
-        for (int i = 0; i != m_statements.size(); i++) {
-            m_statements.get(i).execute();
+    public void execute() throws BreakException {
+        for (final ASTStmtNode statement : this.m_statements) {
+           if (statement instanceof ASTBreakStmtNode) {
+               throw new BreakException();
+           }
+           statement.execute();
         }
     }
 

@@ -17,7 +17,7 @@ public class ASTDeclareStmt extends ASTStmtNode {
 
     @Override
     public void print(OutputStreamWriter outStream, String indent) throws Exception {
-        outStream.write(indent + "Declare " + identifier + "\n");
+        outStream.write(indent + "DECLARE " + identifier + "\n");
     }
 
     @Override

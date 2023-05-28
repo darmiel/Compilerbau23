@@ -3,9 +3,9 @@ package compiler.ast;
 import java.io.OutputStreamWriter;
 
 public class ASTBlockStmtNode extends ASTStmtNode {
-    private ASTStmtNode m_stmtList;
+    private ASTStmtListNode m_stmtList;
 
-    public ASTBlockStmtNode(ASTStmtNode stmtList) {
+    public ASTBlockStmtNode(ASTStmtListNode stmtList) {
         m_stmtList = stmtList;
     }
 
@@ -18,8 +18,7 @@ public class ASTBlockStmtNode extends ASTStmtNode {
 
     @Override
     public void execute() {
-        // TODO Auto-generated method stub
-        
+        this.m_stmtList.execute();
     }
 
     @Override
@@ -40,6 +39,7 @@ public class ASTBlockStmtNode extends ASTStmtNode {
     @Override
     public boolean semicolAfter()  { return false; }
 
-
-    
+    public ASTStmtListNode getM_stmtList() {
+        return m_stmtList;
+    }
 }

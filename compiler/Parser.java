@@ -1,6 +1,7 @@
 package compiler;
 import compiler.TokenIntf.Type;
 import compiler.ast.*;
+import compiler.exceptions.BreakException;
 
 public class Parser {
     private Lexer m_lexer;
@@ -235,14 +236,20 @@ public class Parser {
 			return getWhileStatement();
             //   stmt: functionCallStmt // SELECT = {DOWHILE}
 		} else if (m_lexer.lookAhead().m_type == Token.Type.DO) {
-			return getDoWhileStatement();
+            return getDoWhileStatement();
+        } else if (this.m_lexer.lookAhead().m_type == Type.LOOP) {
+            return this.getLoopStatement();
+        } else if (this.m_lexer.lookAhead().m_type == Type.BREAK) {
+            return this.getBreakStatement();
+        } else if (this.m_lexer.lookAhead().m_type == Type.IF) {
+            return this.getIfStatement();
         }else {
             m_lexer.throwCompilerException("Unexpected Statement", "");
         }
         return null;
     }
 
-    ASTStmtNode getStmtList() throws Exception {
+    ASTStmtListNode getStmtList() throws Exception {
         // stmtlist: stmt stmtlist // SELECT = {IDENTIFIER, DECLARE, PRINT}
         // stmtlist: eps // SELECT = FOLLOW(stmtlist) = {EOF, RBRACE}
         // stmtlist: (stmt)* // TERMINATE on EOF, RBRACE
@@ -260,11 +267,11 @@ public class Parser {
         return stmtList;
     }
 
-    ASTStmtNode getBlockStmt() throws Exception {
+    ASTBlockStmtNode getBlockStmt() throws Exception {
       // blockStmt: LBRACE stmtlist RBRACE
       // SELECT(blockStmt) = FIRST(blockStmt) = { LBRACE }
       m_lexer.expect(TokenIntf.Type.LBRACE);
-      ASTStmtNode stmtListNode = getStmtList();
+      ASTStmtListNode stmtListNode = getStmtList();
       m_lexer.expect(TokenIntf.Type.RBRACE);
       return new ASTBlockStmtNode(stmtListNode);
     }
@@ -400,4 +407,26 @@ public class Parser {
         m_lexer.expect(TokenIntf.Type.SEMICOLON);
         return new ASTDoWhileStmtNode(exprNode, blockstmt);
     }
+
+    private ASTStmtNode getLoopStatement() throws Exception {
+        this.m_lexer.expect(Type.LOOP);
+        final ASTBlockStmtNode block = this.getBlockStmt();
+        this.m_lexer.expect(Type.ENDLOOP);
+        return new ASTLoopStmtNode(block);
+    }
+
+    private ASTStmtNode getBreakStatement() throws Exception {
+        this.m_lexer.expect(Type.BREAK);
+        return new ASTBreakStmtNode();
+    }
+
+    private ASTStmtNode getIfStatement() throws Exception {
+        this.m_lexer.expect(Type.IF);
+        this.m_lexer.expect(Type.LPAREN);
+        final ASTExprNode expr = this.getAndOrExpr();
+        this.m_lexer.expect(Type.RPAREN);
+        final ASTBlockStmtNode block = this.getBlockStmt();
+        return new ASTIfStmtNode(expr, block);
+    }
+
 }
