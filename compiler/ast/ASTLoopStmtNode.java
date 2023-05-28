@@ -26,7 +26,6 @@ public class ASTLoopStmtNode extends ASTStmtNode {
 
     @Override
     public void execute() {
-        int i = 0;
         while (true) {
             try {
                 this.block.execute();

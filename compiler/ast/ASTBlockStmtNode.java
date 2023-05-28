@@ -39,7 +39,4 @@ public class ASTBlockStmtNode extends ASTStmtNode {
     @Override
     public boolean semicolAfter()  { return false; }
 
-    public ASTStmtListNode getM_stmtList() {
-        return m_stmtList;
-    }
 }
