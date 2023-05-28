@@ -12,9 +12,9 @@ import java.io.OutputStreamWriter;
 public class ASTIfStmtNode extends ASTStmtNode {
 
     private final ASTExprNode expr;
-    private final ASTBlockStmtNode block;
+    private final ASTStmtNode block;
 
-    public ASTIfStmtNode(final ASTExprNode expr, final ASTBlockStmtNode block) {
+    public ASTIfStmtNode(final ASTExprNode expr, final ASTStmtNode block) {
         this.expr = expr;
         this.block = block;
     }

@@ -249,7 +249,7 @@ public class Parser {
         return null;
     }
 
-    ASTStmtListNode getStmtList() throws Exception {
+    ASTStmtNode getStmtList() throws Exception {
         // stmtlist: stmt stmtlist // SELECT = {IDENTIFIER, DECLARE, PRINT}
         // stmtlist: eps // SELECT = FOLLOW(stmtlist) = {EOF, RBRACE}
         // stmtlist: (stmt)* // TERMINATE on EOF, RBRACE
@@ -267,11 +267,11 @@ public class Parser {
         return stmtList;
     }
 
-    ASTBlockStmtNode getBlockStmt() throws Exception {
+    ASTStmtNode getBlockStmt() throws Exception {
       // blockStmt: LBRACE stmtlist RBRACE
       // SELECT(blockStmt) = FIRST(blockStmt) = { LBRACE }
       m_lexer.expect(TokenIntf.Type.LBRACE);
-      ASTStmtListNode stmtListNode = getStmtList();
+      ASTStmtNode stmtListNode = getStmtList();
       m_lexer.expect(TokenIntf.Type.RBRACE);
       return new ASTBlockStmtNode(stmtListNode);
     }
@@ -410,7 +410,7 @@ public class Parser {
 
     private ASTStmtNode getLoopStatement() throws Exception {
         this.m_lexer.expect(Type.LOOP);
-        final ASTBlockStmtNode block = this.getBlockStmt();
+        final ASTStmtNode block = this.getBlockStmt();
         this.m_lexer.expect(Type.ENDLOOP);
         return new ASTLoopStmtNode(block);
     }
@@ -425,7 +425,7 @@ public class Parser {
         this.m_lexer.expect(Type.LPAREN);
         final ASTExprNode expr = this.getAndOrExpr();
         this.m_lexer.expect(Type.RPAREN);
-        final ASTBlockStmtNode block = this.getBlockStmt();
+        final ASTStmtNode block = this.getBlockStmt();
         return new ASTIfStmtNode(expr, block);
     }
 

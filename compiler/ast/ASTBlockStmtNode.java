@@ -3,9 +3,9 @@ package compiler.ast;
 import java.io.OutputStreamWriter;
 
 public class ASTBlockStmtNode extends ASTStmtNode {
-    private ASTStmtListNode m_stmtList;
+    private ASTStmtNode m_stmtList;
 
-    public ASTBlockStmtNode(ASTStmtListNode stmtList) {
+    public ASTBlockStmtNode(ASTStmtNode stmtList) {
         m_stmtList = stmtList;
     }
 

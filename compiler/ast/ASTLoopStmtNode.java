@@ -11,9 +11,9 @@ import java.io.OutputStreamWriter;
 
 public class ASTLoopStmtNode extends ASTStmtNode {
 
-    private final ASTBlockStmtNode block;
+    private final ASTStmtNode block;
 
-    public ASTLoopStmtNode(final ASTBlockStmtNode block) {
+    public ASTLoopStmtNode(final ASTStmtNode block) {
         this.block = block;
     }
 
