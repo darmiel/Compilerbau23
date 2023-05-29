@@ -236,13 +236,15 @@ public class Parser {
             //   stmt: functionCallStmt // SELECT = {DOWHILE}
 		} else if (m_lexer.lookAhead().m_type == Token.Type.DO) {
             return getDoWhileStatement();
+        } else if (m_lexer.lookAhead().m_type == Type.EXECUTE) {
+            return getExecuteNTimesStatement();
         //   stmt: loopStmt // SELECT = {LOOP}
         } else if (this.m_lexer.lookAhead().m_type == Type.LOOP) {
             return this.getLoopStatement();
         //   stmt: breakStmt // SELECT = {BREAK}
         } else if (this.m_lexer.lookAhead().m_type == Type.BREAK) {
             return this.getBreakStatement();
-        }else {
+        } else {
             m_lexer.throwCompilerException("Unexpected Statement", "");
         }
         return null;
@@ -419,6 +421,15 @@ public class Parser {
         // breakStmt: BREAK
         this.m_lexer.expect(Type.BREAK);
         return ASTBreakStmtNode.BREAK_STATEMENT_NODE;
+    }
+
+    ASTStmtNode getExecuteNTimesStatement() throws Exception {
+        // executeNTimes: EXECUTE expression TIMES blockStmt
+        m_lexer.expect(Type.EXECUTE);
+        ASTExprNode n = getQuestionMarkExpr();
+        m_lexer.expect(Type.TIMES);
+        ASTStmtNode block = getBlockStmt();
+        return new ASTExecuteNTimes(n, block);
     }
 
 }
