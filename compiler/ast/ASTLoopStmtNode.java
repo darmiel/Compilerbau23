@@ -1,8 +1,6 @@
 package compiler.ast;
 
-import compiler.CompileEnvIntf;
-import compiler.InstrBlock;
-import compiler.InstrIntf;
+import compiler.*;
 import compiler.instr.InstrJump;
 
 import java.io.OutputStreamWriter;
@@ -37,9 +35,13 @@ public class ASTLoopStmtNode extends ASTStmtNode {
         final InstrBlock loopBody = env.createBlock("loop_body");
         final InstrBlock loopExit = env.createBlock("loop_exit");
 
+        env.pushLoopStack(loopExit);
+
         env.addInstr(new InstrJump(loopBody));
         env.setCurrentBlock(loopBody);
         this.block.codegen(env);
+
+        env.popLoopStack();
 
         env.addInstr(new InstrJump(loopExit));
         env.setCurrentBlock(loopExit);

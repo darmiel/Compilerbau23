@@ -420,7 +420,7 @@ public class Parser {
     private ASTStmtNode getBreakStatement() throws Exception {
         // breakStmt: BREAK
         this.m_lexer.expect(Type.BREAK);
-        return ASTBreakStmtNode.BREAK_STATEMENT_NODE;
+        return ASTBreakStmtNode.STATEMENT_NODE;
     }
 
     ASTStmtNode getExecuteNTimesStatement() throws Exception {
