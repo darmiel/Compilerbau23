@@ -236,7 +236,9 @@ public class Parser {
             //   stmt: functionCallStmt // SELECT = {DOWHILE}
 		} else if (m_lexer.lookAhead().m_type == Token.Type.DO) {
 			return getDoWhileStatement();
-        }else {
+        } else if (m_lexer.lookAhead().m_type == Type.EXECUTE) {
+            return getExecuteNTimesStatement();
+        } else {
             m_lexer.throwCompilerException("Unexpected Statement", "");
         }
         return null;
@@ -399,5 +401,14 @@ public class Parser {
         m_lexer.expect(TokenIntf.Type.RPAREN);
         m_lexer.expect(TokenIntf.Type.SEMICOLON);
         return new ASTDoWhileStmtNode(exprNode, blockstmt);
+    }
+
+    ASTStmtNode getExecuteNTimesStatement() throws Exception {
+        // executeNTimes: EXECUTE expression TIMES blockStmt
+        m_lexer.expect(Type.EXECUTE);
+        ASTExprNode n = getQuestionMarkExpr();
+        m_lexer.expect(Type.TIMES);
+        ASTStmtNode block = getBlockStmt();
+        return new ASTExecuteNTimes(n, block);
     }
 }
