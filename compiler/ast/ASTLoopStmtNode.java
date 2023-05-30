@@ -43,7 +43,7 @@ public class ASTLoopStmtNode extends ASTStmtNode {
 
         env.popLoopStack();
 
-        env.addInstr(new InstrJump(loopExit));
+        env.addInstr(new InstrJump(loopBody));
         env.setCurrentBlock(loopExit);
         return null;
     }
