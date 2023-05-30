@@ -16,8 +16,7 @@ public class ASTBlockStmtNode extends ASTStmtNode {
 
     @Override
     public void execute() {
-        // TODO Auto-generated method stub
-        
+        this.m_stmtList.execute();
     }
 
     @Override

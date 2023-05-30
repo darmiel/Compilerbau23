@@ -1,5 +1,4 @@
-IF (1) {
-    PRINT 1;
-} ELSE {
-    PRINT 2;
+{
+    PRINT 10;
 };
+

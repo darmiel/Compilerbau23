@@ -1,5 +1,6 @@
 package compiler.ast;
 
+import compiler.instr.InstrJump;
 import compiler.instr.InstrJumpCond;
 
 import java.io.OutputStreamWriter;
@@ -39,30 +40,39 @@ public class ASTIfStmt extends ASTStmtNode {
     public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
         compiler.InstrBlock conditionBlock = env.createBlock("conditionBlock");
         compiler.InstrBlock trueBlock = env.createBlock("codeTrueBlock");
+        compiler.InstrBlock falseBlock = env.createBlock("codeFalseBlock");
         compiler.InstrBlock blockExit = env.createBlock("ifExit");
 
-        compiler.InstrIntf jumpBlock = new compiler.instr.InstrJump(conditionBlock);
+        compiler.InstrIntf jump = new compiler.instr.InstrJump(conditionBlock);
+        env.addInstr(jump);
+
         env.setCurrentBlock(conditionBlock);
         compiler.InstrIntf conditionInstr = condition.codegen(env);
 
+        env.setCurrentBlock(trueBlock);
+        codeTrue.codegen(env);
+        env.addInstr(new InstrJump(blockExit));
+
 
         if (rightChild == null) {
+            env.setCurrentBlock(conditionBlock);
             compiler.InstrIntf jumpCondBlock = new InstrJumpCond(conditionInstr, trueBlock, blockExit);
             env.addInstr(jumpCondBlock);
         } else {
-            compiler.InstrBlock falseBlock = env.createBlock("codeFalseBlock");
-            env.setCurrentBlock(falseBlock);
-            compiler.InstrIntf codeFalseInstr = rightChild.codegen(env);
-
             env.setCurrentBlock(conditionBlock);
             compiler.InstrIntf jumpCondBlock = new InstrJumpCond(conditionInstr, trueBlock, falseBlock);
             env.addInstr(jumpCondBlock);
 
+            env.setCurrentBlock(falseBlock);
+            rightChild.codegen(env);
+            env.addInstr(new InstrJump(blockExit));
         }
-
-        env.setCurrentBlock(trueBlock);
-        codeTrue.codegen(env);
 
         return null;
     }
+
+//    @Override
+//    public boolean semicolAfter() {
+//        return false;
+//    }
 }
