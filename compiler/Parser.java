@@ -235,9 +235,15 @@ public class Parser {
 			return getWhileStatement();
             //   stmt: functionCallStmt // SELECT = {DOWHILE}
 		} else if (m_lexer.lookAhead().m_type == Token.Type.DO) {
-			return getDoWhileStatement();
+            return getDoWhileStatement();
         } else if (m_lexer.lookAhead().m_type == Type.EXECUTE) {
             return getExecuteNTimesStatement();
+        //   stmt: loopStmt // SELECT = {LOOP}
+        } else if (this.m_lexer.lookAhead().m_type == Type.LOOP) {
+            return this.getLoopStatement();
+        //   stmt: breakStmt // SELECT = {BREAK}
+        } else if (this.m_lexer.lookAhead().m_type == Type.BREAK) {
+            return this.getBreakStatement();
         } else {
             m_lexer.throwCompilerException("Unexpected Statement", "");
         }
@@ -403,6 +409,20 @@ public class Parser {
         return new ASTDoWhileStmtNode(exprNode, blockstmt);
     }
 
+    private ASTStmtNode getLoopStatement() throws Exception {
+        // loopStmt: LOOP blockStmt ENDLOOP
+        m_lexer.expect(Type.LOOP);
+        final ASTStmtNode block = getBlockStmt();
+        m_lexer.expect(Type.ENDLOOP);
+        return new ASTLoopStmtNode(block);
+    }
+
+    private ASTStmtNode getBreakStatement() throws Exception {
+        // breakStmt: BREAK
+        this.m_lexer.expect(Type.BREAK);
+        return ASTBreakStmtNode.STATEMENT_NODE;
+    }
+
     ASTStmtNode getExecuteNTimesStatement() throws Exception {
         // executeNTimes: EXECUTE expression TIMES blockStmt
         m_lexer.expect(Type.EXECUTE);
@@ -411,4 +431,5 @@ public class Parser {
         ASTStmtNode block = getBlockStmt();
         return new ASTExecuteNTimes(n, block);
     }
+
 }

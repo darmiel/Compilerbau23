@@ -31,4 +31,11 @@ public interface CompileEnvIntf {
 	 *  get function table
 	 */
 	public FunctionTable getFunctionTable();
+
+	void pushLoopStack(InstrBlock instrBlock);
+
+	InstrBlock peekLoopStack();
+
+	InstrBlock popLoopStack();
+
 }
