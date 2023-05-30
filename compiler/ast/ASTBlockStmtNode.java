@@ -12,6 +12,8 @@ public class ASTBlockStmtNode extends ASTStmtNode {
     @Override
     public void print(OutputStreamWriter outStream, String indent) throws Exception {
         outStream.write(indent + "ANONYMOUS BLOCK\n");
+        indent += "    ";
+        m_stmtList.print(outStream, indent);
     }
 
     @Override
@@ -33,6 +35,10 @@ public class ASTBlockStmtNode extends ASTStmtNode {
         env.setCurrentBlock(blockExit);
         return null;
     }
+
+    @Override
+    public boolean semicolAfter()  { return false; }
+
 
     
 }

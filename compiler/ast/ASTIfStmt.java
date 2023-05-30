@@ -68,11 +68,13 @@ public class ASTIfStmt extends ASTStmtNode {
             env.addInstr(new InstrJump(blockExit));
         }
 
+        env.setCurrentBlock(blockExit);
+
         return null;
     }
 
-//    @Override
-//    public boolean semicolAfter() {
-//        return false;
-//    }
+    @Override
+    public boolean semicolAfter() {
+        return false;
+    }
 }

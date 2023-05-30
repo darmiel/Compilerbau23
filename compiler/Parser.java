@@ -5,7 +5,14 @@ import compiler.ast.*;
 public class Parser {
     private Lexer m_lexer;
     private SymbolTableIntf m_symbolTable;
-    
+    private FunctionTableIntf m_functionTable;
+
+    public Parser(Lexer lexer, SymbolTableIntf symbolTable, FunctionTableIntf functionTable) {
+        m_lexer = lexer;
+        m_symbolTable = symbolTable;
+        m_functionTable = functionTable;
+    }
+
     public Parser(Lexer lexer, SymbolTableIntf symbolTable) {
         m_lexer = lexer;
         m_symbolTable = symbolTable;
@@ -35,6 +42,8 @@ public class Parser {
         } else if (this.m_lexer.lookAhead().m_type == TokenIntf.Type.IDENT) {
             node = this.getVariableExpr();
             this.m_lexer.advance();
+        }else if(this.m_lexer.lookAhead().m_type == Type.CALL) {
+            node = this.getFunctionCallExpr();
         }else if(m_lexer.lookAhead().m_type == TokenIntf.Type.LPAREN) {
             m_lexer.expect(TokenIntf.Type.LPAREN);
             ASTExprNode innerNode = getQuestionMarkExpr();
@@ -187,11 +196,7 @@ public class Parser {
         m_lexer.expect(TokenIntf.Type.DECLARE);
 
         Token identifier = m_lexer.lookAhead();
-        if (m_symbolTable.getSymbol(identifier.m_value) != null) {
-            m_lexer.throwCompilerException("Identifier already declared previously", "");
-        } else {
-            m_symbolTable.createSymbol(identifier.m_value);
-        }
+        declareVar(identifier);
         m_lexer.advance();
         return new ASTDeclareStmt(identifier);
     }
@@ -216,6 +221,29 @@ public class Parser {
         //    stmt: blockStmt // SELECT = {LBRACE}
         } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.LBRACE) {
             return getBlockStmt();
+        //   stmt: returnStmt // SELECT = {RETURN}
+        } else if(m_lexer.lookAhead().m_type == Type.RETURN) {
+            return getReturnStmt();
+        //   stmt: functionStmt // SELECT = {FUNCTION}
+        } else if(m_lexer.lookAhead().m_type == Type.FUNCTION) {
+            return getFunctionStmt();
+        //   stmt: functionCallStmt // SELECT = {CALL}
+        } else if(m_lexer.lookAhead().m_type == Type.CALL) {
+            return getFunctionCallStmt();
+            //   stmt: functionCallStmt // SELECT = {WHILE}
+        } else if (m_lexer.lookAhead().m_type == Token.Type.WHILE) {
+			return getWhileStatement();
+            //   stmt: functionCallStmt // SELECT = {DOWHILE}
+		} else if (m_lexer.lookAhead().m_type == Token.Type.DO) {
+            return getDoWhileStatement();
+        } else if (m_lexer.lookAhead().m_type == Type.EXECUTE) {
+            return getExecuteNTimesStatement();
+        //   stmt: loopStmt // SELECT = {LOOP}
+        } else if (this.m_lexer.lookAhead().m_type == Type.LOOP) {
+            return this.getLoopStatement();
+        //   stmt: breakStmt // SELECT = {BREAK}
+        } else if (this.m_lexer.lookAhead().m_type == Type.BREAK) {
+            return this.getBreakStatement();
         } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.IF) {
             return getIfStmt();
         } else {
@@ -235,7 +263,9 @@ public class Parser {
         ) {
             ASTStmtNode currentStmt = getStmt();
             stmtList.addStatement(currentStmt);
-            m_lexer.expect(TokenIntf.Type.SEMICOLON);
+            if (currentStmt.semicolAfter()) {
+                m_lexer.expect(TokenIntf.Type.SEMICOLON);
+            }
         }
         return stmtList;
     }
@@ -247,6 +277,161 @@ public class Parser {
       ASTStmtNode stmtListNode = getStmtList();
       m_lexer.expect(TokenIntf.Type.RBRACE);
       return new ASTBlockStmtNode(stmtListNode);
+    }
+
+    ASTStmtNode getFunctionCallStmt() throws Exception {
+        // functioncallstmt: functioncallexpr
+        ASTExprNode expr = getFunctionCallExpr();
+        return new ASTFunctionCallStmtNode(expr);
+    }
+
+    ASTExprNode getFunctionCallExpr() throws Exception {
+        // functioncallExpr: CALL IDENTIFIER LPAREN argumentList RPAREN
+        m_lexer.expect(Type.CALL);
+        Token functionIdentifier = m_lexer.lookAhead();
+        m_lexer.expect(Type.IDENT);
+        m_lexer.expect(Type.LPAREN);
+        ASTArgumentListNode arguments = getArgumentList();
+        m_lexer.expect(Type.RPAREN);
+
+        FunctionInfo funcInfo = m_functionTable.getFunction(functionIdentifier.m_value);
+        if(funcInfo == null) {
+            m_lexer.throwCompilerException("Function " + functionIdentifier.m_value + " is not defined!", null);
+        }
+        if(funcInfo.varNames.size() != arguments.getArguments().size()) {
+            m_lexer.throwCompilerException("Invalid number of Arguments",
+                 "Function " + funcInfo.m_name + " expects " + funcInfo.varNames.size() + " arguments! Got " + arguments.getArguments().size()
+            );
+        }
+
+        return new ASTFunctionCallExprNode(funcInfo, arguments);
+    }
+
+    ASTArgumentListNode getArgumentList() throws Exception {
+        // argumentList: expr (COMMA expr)*  WHILE lookahead = { COMMA }
+        // argumentList: eps    SELECT = { RPAREN }
+        ASTArgumentListNode arguments = new ASTArgumentListNode();
+        if(m_lexer.lookAhead().m_type == Type.RPAREN) {
+            return arguments;
+        }
+        arguments.addArgument(getQuestionMarkExpr());
+        while(m_lexer.lookAhead().m_type == Type.COMMA) {
+            m_lexer.expect(Type.COMMA);
+            arguments.addArgument(getQuestionMarkExpr());
+        }
+        return arguments;
+    }
+
+    ASTStmtNode getFunctionBodyStmt() throws Exception {
+        // functionBody: LBRACE stmtlist RBRACE
+        m_lexer.expect(TokenIntf.Type.LBRACE);
+      ASTStmtNode stmtListNode = getStmtList();
+      m_lexer.expect(TokenIntf.Type.RBRACE);
+      return new ASTFunctionBodyStmtNode(stmtListNode);
+    }
+
+    ASTStmtNode getFunctionStmt() throws Exception {
+        // functionStmt: FUNCTION INDENTIFIER LPAREN parameterList RPAREN blockStmt
+        m_lexer.expect(Type.FUNCTION);
+        Token functionIdentifier = m_lexer.lookAhead();
+        m_lexer.expect(Type.IDENT);
+
+        FunctionInfo functionInfo = declareFunction(functionIdentifier);
+
+        m_lexer.expect(Type.LPAREN);
+        ASTParameterListNode parameters = getParameterList();
+        m_lexer.expect(Type.RPAREN);
+        ASTStmtNode functionBody = getFunctionBodyStmt();
+
+        functionInfo.varNames = parameters.getParametersAsStringList();
+
+        return new ASTFunctionStmtNode(functionInfo, parameters, functionBody);
+    }
+
+    ASTParameterListNode getParameterList() throws Exception {
+        // parameterList: IDENTIFIER (COMMA IDENTIFIER)*	SELECT(parameterList) = { IDENTIFIER }
+        // parameterList: eps		SELECT(parameterList2) = FOLLOW(parameterList) = { RPAREN }
+        ASTParameterListNode parameterList = new ASTParameterListNode();
+        if(m_lexer.lookAhead().m_type == Type.RPAREN) {
+            return parameterList;
+        }
+        Token currentIdentifier = m_lexer.lookAhead();
+        m_lexer.expect(Type.IDENT);
+        parameterList.addParameter(declareVar(currentIdentifier));
+        while(m_lexer.lookAhead().m_type == Type.COMMA) {
+            m_lexer.expect(Type.COMMA);
+            currentIdentifier = m_lexer.lookAhead();
+            m_lexer.expect(Type.IDENT);
+            parameterList.addParameter(declareVar(currentIdentifier));
+        }
+        return parameterList;
+    }
+
+    ASTStmtNode getReturnStmt() throws Exception {
+        // returnStmt: RETURN expression
+        m_lexer.expect(Type.RETURN);
+        ASTExprNode expression = getQuestionMarkExpr();
+        return new ASTReturnStmt(expression);
+    }
+
+    Symbol declareVar(Token identifier) throws Exception {
+        if (m_symbolTable.getSymbol(identifier.m_value) != null) {
+            m_lexer.throwCompilerException("Identifier already declared previously", "");
+            return null;
+        }
+        return m_symbolTable.createSymbol(identifier.m_value);
+    }
+
+    FunctionInfo declareFunction(Token identifier) throws Exception {
+        if(m_functionTable.getFunction(identifier.m_value) != null) {
+            m_lexer.throwCompilerException("Function already declared previously", "");
+            return null;
+        }
+        m_functionTable.createFunction(identifier.m_value, null, null);
+        return m_functionTable.getFunction(identifier.m_value);
+    }
+
+ 	ASTStmtNode getWhileStatement() throws Exception {
+        m_lexer.expect(TokenIntf.Type.WHILE);
+        m_lexer.expect(TokenIntf.Type.LPAREN);
+        ASTExprNode exprNode = getQuestionMarkExpr();
+        m_lexer.expect(TokenIntf.Type.RPAREN);
+        ASTStmtNode blockstmt = getBlockStmt();
+        return new ASTWhileStmtNode(exprNode, blockstmt);
+    }
+
+    ASTStmtNode getDoWhileStatement() throws Exception {
+        m_lexer.expect(TokenIntf.Type.DO);
+        ASTStmtNode blockstmt = getBlockStmt();
+        m_lexer.expect(TokenIntf.Type.WHILE);
+        m_lexer.expect(TokenIntf.Type.LPAREN);
+        ASTExprNode exprNode = getQuestionMarkExpr();
+        m_lexer.expect(TokenIntf.Type.RPAREN);
+        m_lexer.expect(TokenIntf.Type.SEMICOLON);
+        return new ASTDoWhileStmtNode(exprNode, blockstmt);
+    }
+
+    private ASTStmtNode getLoopStatement() throws Exception {
+        // loopStmt: LOOP blockStmt ENDLOOP
+        m_lexer.expect(Type.LOOP);
+        final ASTStmtNode block = getBlockStmt();
+        m_lexer.expect(Type.ENDLOOP);
+        return new ASTLoopStmtNode(block);
+    }
+
+    private ASTStmtNode getBreakStatement() throws Exception {
+        // breakStmt: BREAK
+        this.m_lexer.expect(Type.BREAK);
+        return ASTBreakStmtNode.STATEMENT_NODE;
+    }
+
+    ASTStmtNode getExecuteNTimesStatement() throws Exception {
+        // executeNTimes: EXECUTE expression TIMES blockStmt
+        m_lexer.expect(Type.EXECUTE);
+        ASTExprNode n = getQuestionMarkExpr();
+        m_lexer.expect(Type.TIMES);
+        ASTStmtNode block = getBlockStmt();
+        return new ASTExecuteNTimes(n, block);
     }
 
     ASTStmtNode getIfStmt() throws Exception {

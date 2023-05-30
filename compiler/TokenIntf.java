@@ -42,6 +42,7 @@ public abstract class TokenIntf {
 		DO,
 		FOR,
 		LOOP,
+		ENDLOOP,
 		BREAK,
 		SWITCH,
 		CASE,

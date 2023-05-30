@@ -6,7 +6,7 @@ public class CodegenMain {
         String program = compiler.InputReader.fileToString(args[0]);
         compiler.CompileEnv env = new compiler.CompileEnv(program, false);
         env.compile();
-        //env.dump(System.out);
+        env.dump(System.out);
         OutputStreamWriter outStream = new OutputStreamWriter(System.out);
         env.execute(outStream);
     }

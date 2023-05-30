@@ -1,4 +1,7 @@
+DECLARE a;
+DECLARE flag;
+flag = 1;
 {
-    PRINT 10;
-};
-
+  a = 5+2;
+}
+PRINT flag ? 6*3 - a : 15;
