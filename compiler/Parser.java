@@ -6,7 +6,7 @@ public class Parser {
     private Lexer m_lexer;
     private SymbolTableIntf m_symbolTable;
     private FunctionTableIntf m_functionTable;
-    
+
     public Parser(Lexer lexer, SymbolTableIntf symbolTable, FunctionTableIntf functionTable) {
         m_lexer = lexer;
         m_symbolTable = symbolTable;
@@ -244,6 +244,8 @@ public class Parser {
         //   stmt: breakStmt // SELECT = {BREAK}
         } else if (this.m_lexer.lookAhead().m_type == Type.BREAK) {
             return this.getBreakStatement();
+        } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.IF) {
+            return getIfStmt();
         } else {
             m_lexer.throwCompilerException("Unexpected Statement", "");
         }
@@ -291,7 +293,7 @@ public class Parser {
         m_lexer.expect(Type.LPAREN);
         ASTArgumentListNode arguments = getArgumentList();
         m_lexer.expect(Type.RPAREN);
-        
+
         FunctionInfo funcInfo = m_functionTable.getFunction(functionIdentifier.m_value);
         if(funcInfo == null) {
             m_lexer.throwCompilerException("Function " + functionIdentifier.m_value + " is not defined!", null);
@@ -308,7 +310,7 @@ public class Parser {
     ASTArgumentListNode getArgumentList() throws Exception {
         // argumentList: expr (COMMA expr)*  WHILE lookahead = { COMMA }
         // argumentList: eps    SELECT = { RPAREN }
-        ASTArgumentListNode arguments = new ASTArgumentListNode(); 
+        ASTArgumentListNode arguments = new ASTArgumentListNode();
         if(m_lexer.lookAhead().m_type == Type.RPAREN) {
             return arguments;
         }
@@ -379,7 +381,7 @@ public class Parser {
         }
         return m_symbolTable.createSymbol(identifier.m_value);
     }
-    
+
     FunctionInfo declareFunction(Token identifier) throws Exception {
         if(m_functionTable.getFunction(identifier.m_value) != null) {
             m_lexer.throwCompilerException("Function already declared previously", "");
@@ -430,6 +432,31 @@ public class Parser {
         m_lexer.expect(Type.TIMES);
         ASTStmtNode block = getBlockStmt();
         return new ASTExecuteNTimes(n, block);
+    }
+
+    ASTStmtNode getIfStmt() throws Exception {
+        // ifStmt := IF LBRACE stmt RBRACE blockStmt // SELECT(ifStmt) = { IF }
+        m_lexer.expect(Type.IF);
+        m_lexer.expect(Type.LPAREN);
+        ASTExprNode condition = getQuestionMarkExpr();
+        m_lexer.expect(Type.RPAREN);
+        ASTStmtNode codeTrue = getBlockStmt();
+
+        if (m_lexer.lookAhead().m_type == Type.ELSE) {
+            m_lexer.advance();
+            // ifStmt := IF LBRACE stmt RBRACE blockStmt ELSE blockStmt // SELECT(blockStmt) = { LBRACE }
+            if (m_lexer.lookAhead().m_type == Type.LBRACE) {
+                ASTStmtNode codeFalse = getBlockStmt();
+                return new ASTIfStmt(condition, codeTrue, codeFalse);
+            }
+            // ifStmt := IF LBRACE stmt RBRACE blockStmt ELSE ifStmt // SELECT(ifStmt) = { IF }
+            if (m_lexer.lookAhead().m_type == Type.IF) {
+                ASTStmtNode elseIf = getIfStmt();
+                return new ASTIfStmt(condition, codeTrue, elseIf);
+            }
+        }
+
+        return new ASTIfStmt(condition, codeTrue, null);
     }
 
 }
