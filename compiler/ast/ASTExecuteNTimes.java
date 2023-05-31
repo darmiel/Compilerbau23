@@ -4,7 +4,6 @@ import compiler.*;
 import compiler.instr.*;
 
 import java.io.OutputStreamWriter;
-import java.util.Random;
 
 public class ASTExecuteNTimes extends ASTStmtNode {
 
@@ -35,7 +34,7 @@ public class ASTExecuteNTimes extends ASTStmtNode {
     @Override
     public InstrIntf codegen(CompileEnvIntf env) {
         // Create helper variable name
-        Symbol counterSymbol = new Symbol("counter_" + new Random().nextLong(), 0);
+        Symbol counterSymbol = env.createUniqueSymbol("counter", 0);
 
         // Define Blocks
         InstrBlock initBlock = env.createBlock("init");
