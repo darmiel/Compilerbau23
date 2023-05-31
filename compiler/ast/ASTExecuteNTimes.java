@@ -43,6 +43,7 @@ public class ASTExecuteNTimes extends ASTStmtNode {
 
         // Codegen
         // init:
+        env.addInstr(new InstrJump(initBlock));
         env.setCurrentBlock(initBlock);
         // eval n -> %1
         InstrIntf nInstr = n.codegen(env);
