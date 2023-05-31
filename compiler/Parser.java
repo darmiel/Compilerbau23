@@ -212,13 +212,13 @@ public class Parser {
         // stmt: assignStmt // SELECT = {IDENTIFIER}
         if (m_lexer.lookAhead().m_type == TokenIntf.Type.IDENT) {
             return getAssignStmt();
-        //    stmt: varDeclareStmt // SELECT = {DECLARE}
+            //    stmt: varDeclareStmt // SELECT = {DECLARE}
         } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.DECLARE) {
             return getVarDeclareStmt();
-        //    stmt: printStmt // SELECT = {PRINT}
+            //    stmt: printStmt // SELECT = {PRINT}
         } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.PRINT) {
             return getPrintStmt();
-        //    stmt: blockStmt // SELECT = {LBRACE}
+            //    stmt: blockStmt // SELECT = {LBRACE}
         } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.LBRACE) {
             return getBlockStmt();
         //   stmt: returnStmt // SELECT = {RETURN}
@@ -246,6 +246,9 @@ public class Parser {
             return this.getBreakStatement();
         } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.IF) {
             return getIfStmt();
+            //    stmt: switchCaseStmt // SELECT = {SWITCH}
+        } else if (m_lexer.lookAhead().m_type == TokenIntf.Type.SWITCH) {
+            return getSwitchCaseStmt();
         } else {
             m_lexer.throwCompilerException("Unexpected Statement", "");
         }
@@ -457,6 +460,41 @@ public class Parser {
         }
 
         return new ASTIfStmt(condition, codeTrue, null);
+    }
+
+    ASTStmtNode getSwitchCaseStmt() throws Exception {
+        //switch_case_stmt: 'SWITCH' 'LPAREN' expr 'RPAREN' 'LBRACE' case_list 'RBRACE'
+        m_lexer.expect(TokenIntf.Type.SWITCH);
+        m_lexer.expect(TokenIntf.Type.LPAREN);
+        ASTExprNode exprNode = getUnaryExpr();
+        m_lexer.expect(TokenIntf.Type.RPAREN);
+        m_lexer.expect(TokenIntf.Type.LBRACE);
+        ASTCaseListNode caseListNode = getCaseList();
+        m_lexer.expect(TokenIntf.Type.RBRACE);
+        return new ASTSwitchCaseStmtNode(exprNode, caseListNode);
+    }
+
+    ASTCaseListNode getCaseList() throws Exception {
+        //case_list: case_stmt | case_stmt case_list
+        ASTCaseListNode caseList = new ASTCaseListNode();
+        while (
+                m_lexer.lookAhead().m_type != TokenIntf.Type.EOF &&
+                        m_lexer.lookAhead().m_type != TokenIntf.Type.RBRACE
+        ) {
+            ASTCaseNode currentCase = getCaseStmt();
+            caseList.addStatement(currentCase);
+        }
+        return caseList;
+    }
+
+    ASTCaseNode getCaseStmt() throws Exception {
+        //case_stmt: 'CASE' number ':' stmt_list
+        m_lexer.expect(TokenIntf.Type.CASE);
+        Token number = m_lexer.lookAhead();
+        m_lexer.expect(TokenIntf.Type.INTEGER);
+        m_lexer.expect(TokenIntf.Type.DOUBLECOLON);
+        ASTStmtNode stmtListNode = getStmtList();
+        return new ASTCaseNode(number, stmtListNode);
     }
 
 }
