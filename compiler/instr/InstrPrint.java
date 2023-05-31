@@ -14,6 +14,7 @@ public class InstrPrint extends compiler.InstrIntf {
     @Override
     public void execute(ExecutionEnvIntf env) {
         try {
+            System.out.println(m_expr.getValue());  // TODO: so gehts, so wie in Z. 18 nicht ??
             env.getOutputStream().write(Integer.toString(m_expr.getValue()));
             env.getOutputStream().write("\n");
         } catch (Exception e) {
