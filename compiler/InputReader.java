@@ -3,6 +3,7 @@ package compiler;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * provide input string as stream
@@ -84,7 +85,7 @@ public class InputReader implements InputReaderIntf, Cloneable {
 	}
 
 	public static String fileToString(String fileName) throws Exception {
-		Path filePath = Path.of(fileName);
+		Path filePath = Paths.get(fileName);
 		String content = Files.readString(filePath);
 		return content;
 	}
