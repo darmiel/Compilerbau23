@@ -1,14 +1,23 @@
 $IN
-DECLARE index;
-DECLARE sum;
-sum = 0;
-index = 0;
-EXECUTE 10 TIMES {
-	sum = sum + index;
-	index = index + 1;
-};
-PRINT index;
-PRINT sum;
+DECLARE in;
+DECLARE out;
+in = 3;
+out = 0;
+SWITCH(in + 1) {
+CASE 1:
+  out = 2;
+CASE 2:
+  out = 3;
+CASE 4:
+  out = 3;
+  in = 4;
+CASE 3:
+  out = 5;
+CASE 5:
+  out = 2;
+}
+PRINT in;
+PRINT out;
 $OUT
-45
-9
+4
+3

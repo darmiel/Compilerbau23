@@ -86,7 +86,7 @@ public class InputReader implements InputReaderIntf, Cloneable {
 
 	public static String fileToString(String fileName) throws Exception {
 		Path filePath = Paths.get(fileName);
-		String content = Files.readAllBytes(filePath).toString();
+		String content = Files.readString(filePath);
 		return content;
 	}
 }
