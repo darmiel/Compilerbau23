@@ -1,7 +1,11 @@
 package compiler.ast;
 
+import compiler.CompileEnvIntf;
 import compiler.Token;
 import compiler.TokenIntf;
+import compiler.instr.InstrJump;
+import compiler.InstrIntf;
+import compiler.InstrBlock;
 
 import java.io.OutputStreamWriter;
 
@@ -33,6 +37,15 @@ public class ASTAndOrExprNode extends ASTExprNode {
             return (lhsVal > 0 && rhsVal > 0) ? 1 : 0;
         }
         return (lhsVal > 0 || rhsVal > 0) ? 1 : 0;
+    }
+
+    @Override 
+    public InstrIntf codegen(CompileEnvIntf env){
+        compiler.InstrIntf lhs = this.lhs.codegen(env);
+        compiler.InstrIntf rhs = this.rhs.codegen(env);
+        compiler.InstrIntf instr = new compiler.instr.InstrAndOrExpr(token.m_type, lhs, rhs);
+        env.addInstr(instr);
+        return instr;
     }
 
 }
