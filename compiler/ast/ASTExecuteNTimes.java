@@ -47,7 +47,6 @@ public class ASTExecuteNTimes extends ASTStmtNode {
         env.setCurrentBlock(initBlock);
         // eval n -> %1
         InstrIntf nInstr = n.codegen(env);
-        env.addInstr(nInstr);
         // store %1 -> counter
         env.addInstr(new InstrAssignStmt(counterSymbol, nInstr));
         // cmp %1 < 1 -> %2
