@@ -257,12 +257,13 @@ public class Parser {
 
     ASTStmtNode getStmtList() throws Exception {
         // stmtlist: stmt stmtlist // SELECT = {IDENTIFIER, DECLARE, PRINT}
-        // stmtlist: eps // SELECT = FOLLOW(stmtlist) = {EOF, RBRACE}
-        // stmtlist: (stmt)* // TERMINATE on EOF, RBRACE
+        // stmtlist: eps // SELECT = FOLLOW(stmtlist) = {EOF, RBRACE, CASE}
+        // stmtlist: (stmt)* // TERMINATE on EOF, RBRACE, CASE
         ASTStmtListNode stmtList = new ASTStmtListNode();
         while (
             m_lexer.lookAhead().m_type != TokenIntf.Type.EOF &&
-            m_lexer.lookAhead().m_type != TokenIntf.Type.RBRACE
+            m_lexer.lookAhead().m_type != TokenIntf.Type.RBRACE &&
+                    m_lexer.lookAhead().m_type != TokenIntf.Type.CASE
         ) {
             ASTStmtNode currentStmt = getStmt();
             stmtList.addStatement(currentStmt);
@@ -466,7 +467,7 @@ public class Parser {
         //switch_case_stmt: 'SWITCH' 'LPAREN' expr 'RPAREN' 'LBRACE' case_list 'RBRACE'
         m_lexer.expect(TokenIntf.Type.SWITCH);
         m_lexer.expect(TokenIntf.Type.LPAREN);
-        ASTExprNode exprNode = getUnaryExpr();
+        ASTExprNode exprNode = getQuestionMarkExpr();
         m_lexer.expect(TokenIntf.Type.RPAREN);
         m_lexer.expect(TokenIntf.Type.LBRACE);
         ASTCaseListNode caseListNode = getCaseList();
@@ -477,10 +478,7 @@ public class Parser {
     ASTCaseListNode getCaseList() throws Exception {
         //case_list: case_stmt | case_stmt case_list
         ASTCaseListNode caseList = new ASTCaseListNode();
-        while (
-                m_lexer.lookAhead().m_type != TokenIntf.Type.EOF &&
-                        m_lexer.lookAhead().m_type != TokenIntf.Type.RBRACE
-        ) {
+        while (m_lexer.lookAhead().m_type != TokenIntf.Type.RBRACE) {
             ASTCaseNode currentCase = getCaseStmt();
             caseList.addStatement(currentCase);
         }
@@ -489,8 +487,11 @@ public class Parser {
 
     ASTCaseNode getCaseStmt() throws Exception {
         //case_stmt: 'CASE' number ':' stmt_list
+        ASTIntegerLiteralNode number = null;
         m_lexer.expect(TokenIntf.Type.CASE);
-        Token number = m_lexer.lookAhead();
+        if(m_lexer.lookAhead().m_type == Type.INTEGER){
+            number = new ASTIntegerLiteralNode(m_lexer.lookAhead().m_value);
+        }
         m_lexer.expect(TokenIntf.Type.INTEGER);
         m_lexer.expect(TokenIntf.Type.DOUBLECOLON);
         ASTStmtNode stmtListNode = getStmtList();
