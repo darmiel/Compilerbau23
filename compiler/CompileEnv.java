@@ -19,6 +19,8 @@ public class CompileEnv implements CompileEnvIntf {
     private int m_nextBlockId = 0;
     private Stack<InstrBlock> loopStack;
 
+    private long uniqueSymbolCounter = 0;
+
 
     // cool kids would use a dedicated compile env config class for that...
     public CompileEnv(String input, boolean trace) throws Exception {
@@ -34,6 +36,11 @@ public class CompileEnv implements CompileEnvIntf {
     
     public InstrBlock popLoopStack(){
         return this.loopStack.pop();
+    }
+
+    @Override
+    public Symbol createUniqueSymbol(String prefix, int number) {
+        return new Symbol("$" + prefix + uniqueSymbolCounter++, number);
     }
 
     public void pushLoopStack(InstrBlock instrBlock){
