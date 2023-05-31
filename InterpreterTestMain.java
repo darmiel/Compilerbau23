@@ -4,7 +4,7 @@ public class InterpreterTestMain {
 
     public static void main(String[] args) throws Exception {
         // open input file
-        String testSuiteContent = compiler.InputReader.fileToString("SwitchCaseTest.txt");
+        String testSuiteContent = compiler.InputReader.fileToString("InterpreterTestInput.txt");
 
         compiler.InputReader inputReader = new compiler.InputReader(testSuiteContent);
         test.TestSuite testSuite = new test.TestSuite();
