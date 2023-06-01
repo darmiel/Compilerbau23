@@ -19,6 +19,8 @@ public class CompileEnv implements CompileEnvIntf {
     private int m_nextBlockId = 0;
     private Stack<InstrBlock> loopStack;
 
+    private long uniqueSymbolCounter = 0;
+
 
     // cool kids would use a dedicated compile env config class for that...
     public CompileEnv(String input, boolean trace) throws Exception {
@@ -27,13 +29,18 @@ public class CompileEnv implements CompileEnvIntf {
         m_functionTable = new FunctionTable();
         m_lexer = new Lexer();
         m_lexer.init(input);
-        m_parser = new Parser(m_lexer, this.m_symbolTable);
+        m_parser = new Parser(m_lexer, this.m_symbolTable, m_functionTable);
         m_blockList = new ArrayList<InstrBlock>();
         loopStack = new Stack<InstrBlock>();
     }
     
     public InstrBlock popLoopStack(){
         return this.loopStack.pop();
+    }
+
+    @Override
+    public Symbol createUniqueSymbol(String prefix, int number) {
+        return new Symbol("$" + prefix + uniqueSymbolCounter++, number);
     }
 
     public void pushLoopStack(InstrBlock instrBlock){

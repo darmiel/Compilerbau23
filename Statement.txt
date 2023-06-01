@@ -3,5 +3,5 @@ DECLARE flag;
 flag = 1;
 {
   a = 5+2;
-};
+}
 PRINT flag ? 6*3 - a : 15;

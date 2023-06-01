@@ -24,6 +24,15 @@ public class ASTCompareExprNode extends ASTExprNode {
     }
 
     @Override
+    public compiler.InstrIntf codegen(compiler.CompileEnvIntf env) {
+        compiler.InstrIntf lhs = m_lhs.codegen(env);
+        compiler.InstrIntf rhs = m_rhs.codegen(env);
+        compiler.InstrIntf instr = new compiler.instr.InstrCompare(m_token.m_type, lhs, rhs);
+        env.addInstr(instr);
+        return instr;
+    }
+
+    @Override
     public int eval() {
         int lhsVal =m_lhs.eval();
         int rhsVal = m_rhs.eval();

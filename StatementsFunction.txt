@@ -1,0 +1,8 @@
+
+FUNCTION asd(a,b,c) {
+  RETURN a + b + c;
+};
+
+DECLARE res;
+res = CALL asd(2+10, 5, 5);
+PRINT res;
