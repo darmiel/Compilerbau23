@@ -2,6 +2,7 @@ package compiler.ast;
 
 import compiler.InstrBlock;
 import compiler.InstrIntf;
+import compiler.Symbol;
 import compiler.instr.InstrJump;
 
 import java.io.OutputStreamWriter;

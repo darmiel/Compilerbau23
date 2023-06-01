@@ -38,4 +38,10 @@ public class ASTSwitchCaseStmtNode extends ASTStmtNode{
         m_caseList.codegen(env, m_expr);
         return null;
     }
+
+    @Override
+    public boolean semicolAfter() {
+        return false;
+    }
+
 }
