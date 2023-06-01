@@ -1,11 +1,7 @@
 package compiler.ast;
 
-import compiler.CompileEnvIntf;
-import compiler.Token;
-import compiler.TokenIntf;
-import compiler.instr.InstrJump;
-import compiler.InstrIntf;
-import compiler.InstrBlock;
+import compiler.*;
+import compiler.instr.*;
 
 import java.io.OutputStreamWriter;
 
@@ -41,11 +37,47 @@ public class ASTAndOrExprNode extends ASTExprNode {
 
     @Override 
     public InstrIntf codegen(CompileEnvIntf env){
-        compiler.InstrIntf lhs = this.lhs.codegen(env);
-        compiler.InstrIntf rhs = this.rhs.codegen(env);
-        compiler.InstrIntf instr = new compiler.instr.InstrAndOrExpr(token.m_type, lhs, rhs);
-        env.addInstr(instr);
-        return instr;
+        Symbol result = env.createUniqueSymbol("result", 0);
+
+        InstrBlock init = env.createBlock("init");
+        InstrBlock compare = env.createBlock("compare");
+        InstrBlock exit = env.createBlock("exit");
+
+        env.addInstr(new InstrJump(init));
+        env.setCurrentBlock(init);
+
+        InstrIntf lhsVal = new InstrIntegerLiteral(1);
+        env.addInstr(lhsVal);
+        lhs.codegen(env);
+        InstrIntf rhsVal = new InstrIntegerLiteral(rhs.eval());
+        env.addInstr(rhsVal);
+        rhs.codegen(env);
+
+        if(token.m_type == Token.Type.AND){
+            env.addInstr(new InstrAssignStmt(result, lhsVal));
+            InstrIntf condition = new InstrJumpCond(lhsVal, compare, exit);
+            env.addInstr(condition);
+            //compare
+            env.setCurrentBlock(compare);
+            InstrIntf unaryExp = new InstrAndOrExpr(TokenIntf.Type.AND,lhsVal,rhsVal);
+            env.addInstr(unaryExp);
+            env.addInstr(new InstrAssignStmt(result, unaryExp));
+            env.addInstr(new InstrJump(exit));
+        }else if(token.m_type == Token.Type.OR){
+            env.addInstr(new InstrAssignStmt(result, lhsVal));
+            InstrIntf condition = new InstrJumpCond(lhsVal, exit, compare);
+            env.addInstr(condition);
+            //compare
+            env.setCurrentBlock(compare);
+            InstrIntf unaryExp = new InstrAndOrExpr(TokenIntf.Type.OR,lhsVal,rhsVal);
+            env.addInstr(unaryExp);
+            env.addInstr(new InstrAssignStmt(result, unaryExp));
+            env.addInstr(new InstrJump(exit));
+        }
+
+        //exit
+        env.setCurrentBlock(exit);
+        return new InstrIntegerLiteral(result.m_number);
     }
 
 }
