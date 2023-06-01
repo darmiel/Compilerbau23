@@ -5,11 +5,7 @@ public class ExpressionParserMain {
     public static void main(String[] args) throws Exception {
         compiler.Lexer lexer = new compiler.Lexer();
         compiler.Parser exprParser = new compiler.Parser(lexer);
-        compiler.ast.ASTExprNode expr = exprParser.parseExpression("INTEGER index;" +
-                "INTEGER sum;" +
-                "index = 10 - 20;" +
-                "sum = 0;" +
-                "PRINT sum;");
+        compiler.ast.ASTExprNode expr = exprParser.parseExpression("5 < 4 ? 4 + 13 : 2 && 3 ");
         System.out.print("Ergebnis: ");
         System.out.println(expr.eval());
         OutputStreamWriter outStream = new OutputStreamWriter(System.out, "UTF-8");

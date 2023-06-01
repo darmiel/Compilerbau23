@@ -1,8 +1,14 @@
-DECLARE index;
-DECLARE sum;
-index = 0;
-sum = 0;
-FOR(index = 10; index; index = index - 1) {
-  sum = sum + index;
-}
-PRINT sum;
+$IN
+DECLARE a;
+DECLARE flag;
+flag = 1;
+{
+  a = 5+2;
+};
+PRINT flag ? 6*3 - a : 15;
+$OUT
+11
+$IN
+PRINT 15;
+$OUT
+15

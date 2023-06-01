@@ -14,12 +14,6 @@ public class ASTQuestionMarkNode extends ASTExprNode {
         this.value2 = value2;
     }
 
-//    public ConstInfo constFold() {
-//        final ConstInfo cond = this.cond.constFold();
-//        final ConstInfo cond = this.cond.constFold();
-//        final ConstInfo cond = this.cond.constFold();
-//    }
-
     @Override
     public void print(OutputStreamWriter outStream, String indent) throws Exception {
         outStream.write(indent);
