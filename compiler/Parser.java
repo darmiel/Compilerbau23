@@ -299,6 +299,7 @@ public class Parser {
         ASTStmtNode body = getStmtList();
         m_lexer.expect(Type.RBRACE);
         return new ASTForStmtNode(iteratorStmt, conditionExpr, iteratorOperationStmt, body);
+    }
 
     ASTStmtNode getFunctionCallStmt() throws Exception {
         // functioncallstmt: functioncallexpr
