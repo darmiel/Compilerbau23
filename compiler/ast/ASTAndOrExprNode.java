@@ -35,6 +35,7 @@ public class ASTAndOrExprNode extends ASTExprNode {
         return (lhsVal > 0 || rhsVal > 0) ? 1 : 0;
     }
 
+
     @Override 
     public InstrIntf codegen(CompileEnvIntf env){
         Symbol result = env.createUniqueSymbol("result", 0);
@@ -46,30 +47,27 @@ public class ASTAndOrExprNode extends ASTExprNode {
         env.addInstr(new InstrJump(init));
         env.setCurrentBlock(init);
 
-        InstrIntf lhsVal = new InstrIntegerLiteral(1);
+        InstrIntf lhsVal = new InstrIntegerLiteral(lhs.eval());
         env.addInstr(lhsVal);
-        lhs.codegen(env);
         InstrIntf rhsVal = new InstrIntegerLiteral(rhs.eval());
         env.addInstr(rhsVal);
-        rhs.codegen(env);
 
         if(token.m_type == Token.Type.AND){
-            env.addInstr(new InstrAssignStmt(result, lhsVal));
             InstrIntf condition = new InstrJumpCond(lhsVal, compare, exit);
             env.addInstr(condition);
             //compare
             env.setCurrentBlock(compare);
-            InstrIntf unaryExp = new InstrAndOrExpr(TokenIntf.Type.AND,lhsVal,rhsVal);
+            InstrIntf unaryExp = new InstrCompare(TokenIntf.Type.EQUAL, new InstrIntegerLiteral(1), rhsVal);
             env.addInstr(unaryExp);
             env.addInstr(new InstrAssignStmt(result, unaryExp));
             env.addInstr(new InstrJump(exit));
         }else if(token.m_type == Token.Type.OR){
-            env.addInstr(new InstrAssignStmt(result, lhsVal));
+            env.addInstr(new InstrAssignStmt(result, new InstrIntegerLiteral(1)));
             InstrIntf condition = new InstrJumpCond(lhsVal, exit, compare);
             env.addInstr(condition);
             //compare
             env.setCurrentBlock(compare);
-            InstrIntf unaryExp = new InstrAndOrExpr(TokenIntf.Type.OR,lhsVal,rhsVal);
+            InstrIntf unaryExp = new InstrCompare(TokenIntf.Type.EQUAL, new InstrIntegerLiteral(1), rhsVal);
             env.addInstr(unaryExp);
             env.addInstr(new InstrAssignStmt(result, unaryExp));
             env.addInstr(new InstrJump(exit));
@@ -77,6 +75,7 @@ public class ASTAndOrExprNode extends ASTExprNode {
 
         //exit
         env.setCurrentBlock(exit);
+        System.out.println(result);
         return new InstrIntegerLiteral(result.m_number);
     }
 
