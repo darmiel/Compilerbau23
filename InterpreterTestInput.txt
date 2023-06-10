@@ -1,4 +1,3 @@
-$IN
 DECLARE a;
 DECLARE b;
 a = 1;
@@ -6,8 +5,4 @@ PRINT a && b;
 PRINT a || b;
 PRINT a || 0/1;
 PRINT b && 0/1;
-$OUT
-0
-1
-0
-0
+

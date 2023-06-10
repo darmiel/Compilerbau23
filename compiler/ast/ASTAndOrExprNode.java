@@ -47,35 +47,28 @@ public class ASTAndOrExprNode extends ASTExprNode {
         env.addInstr(new InstrJump(init));
         env.setCurrentBlock(init);
 
-        InstrIntf lhsVal = new InstrIntegerLiteral(lhs.eval());
+        InstrIntf lhsVal = new InstrIntegerLiteral(lhs.codegen(env).getValue());
         env.addInstr(lhsVal);
-        InstrIntf rhsVal = new InstrIntegerLiteral(rhs.eval());
-        env.addInstr(rhsVal);
 
         if(token.m_type == Token.Type.AND){
             InstrIntf condition = new InstrJumpCond(lhsVal, compare, exit);
             env.addInstr(condition);
-            //compare
-            env.setCurrentBlock(compare);
-            InstrIntf unaryExp = new InstrCompare(TokenIntf.Type.EQUAL, new InstrIntegerLiteral(1), rhsVal);
-            env.addInstr(unaryExp);
-            env.addInstr(new InstrAssignStmt(result, unaryExp));
-            env.addInstr(new InstrJump(exit));
         }else if(token.m_type == Token.Type.OR){
-            env.addInstr(new InstrAssignStmt(result, new InstrIntegerLiteral(1)));
             InstrIntf condition = new InstrJumpCond(lhsVal, exit, compare);
             env.addInstr(condition);
-            //compare
-            env.setCurrentBlock(compare);
-            InstrIntf unaryExp = new InstrCompare(TokenIntf.Type.EQUAL, new InstrIntegerLiteral(1), rhsVal);
-            env.addInstr(unaryExp);
-            env.addInstr(new InstrAssignStmt(result, unaryExp));
-            env.addInstr(new InstrJump(exit));
         }
+
+        //compare
+        env.setCurrentBlock(compare);
+        InstrIntf comp = new InstrIntegerLiteral(1);
+        env.addInstr(comp);
+        InstrIntf unaryExp = new InstrCompare(TokenIntf.Type.EQUAL, comp, rhs.codegen(env));
+        env.addInstr(unaryExp);
+        env.addInstr(new InstrAssignStmt(result, unaryExp));
+        env.addInstr(new InstrJump(exit));
 
         //exit
         env.setCurrentBlock(exit);
-        System.out.println(result);
         return new InstrIntegerLiteral(result.m_number);
     }
 
