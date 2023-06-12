@@ -1,5 +1,5 @@
-DECLARE sum;
-DECLARE i;
-sum = 0;
-i = 0;
-PRINT sum + i;
+DECLARE a;
+DECLARE b;
+a = 1;
+b = 2;
+PRINT a || 0/1;
