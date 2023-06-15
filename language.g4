@@ -6,7 +6,12 @@ PLUS: '+';
 MINUS: '-';
 WS: [ \t\r\n]+ -> skip;
 
+andOrExpr: cmpExpr (andOrOp cmpExpr)*;
 andOrOp: AND|OR;
 AND: '&&';
 OR: '||';
-andOrExpr: cmpExpr (andOrOp cmpExpr)*;
+
+shiftExpr: sumExpr (shiftOp sumExpr)*;
+shiftOp: SHIFTLEFT | SHIFTRIGHT;
+SHIFTLEFT: '<<';
+SHIFTRRIGHT: '>>';
